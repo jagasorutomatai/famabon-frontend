@@ -2,12 +2,18 @@
   <v-navigation-drawer app clipped>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="title">
-          famabon
-        </v-list-item-title>
         <v-list-item-subtitle>
-          家計簿管理アプリケーション
+          家計簿管理アプリケーション<br />
+          家計簿を記入する↓
         </v-list-item-subtitle>
+        <v-list-item-action>
+          <v-btn block color="info" depressed>
+            <v-icon dark left>
+              mdi-plus
+            </v-icon>
+            作成
+          </v-btn>
+        </v-list-item-action>
       </v-list-item-content>
     </v-list-item>
 

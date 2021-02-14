@@ -1,6 +1,7 @@
 import store from "@/store/index";
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Book from "../views/Book.vue";
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 
@@ -16,6 +17,11 @@ const routes = [
     path: "/login",
     name: "login",
     component: Login
+  },
+  {
+    path: "/household/book",
+    name: "Book",
+    component: Book
   }
 ];
 
