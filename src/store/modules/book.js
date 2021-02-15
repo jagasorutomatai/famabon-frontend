@@ -81,8 +81,16 @@ const actions = {
     let title = "title=" + payload.title;
     let date_after = "date_after=" + payload.date_after;
     let date_before = "date_before=" + payload.date_before;
+    let tag = "tag=" + payload.tag;
     let url =
-      "/household/books/?" + title + "&" + date_after + "&" + date_before;
+      "/household/books/?" +
+      title +
+      "&" +
+      date_after +
+      "&" +
+      date_before +
+      "&" +
+      tag;
     famabonApi.setRequestHeader(Cookies.get("access"));
     return famabonApi
       .get(url)
