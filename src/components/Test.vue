@@ -1,23 +1,7 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="12" sm="6">
-        <v-toolbar flat>
-          <v-toolbar-title>今月の収入</v-toolbar-title>
-          <v-spacer></v-spacer>
-          240000 円
-        </v-toolbar>
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-toolbar flat>
-          <v-toolbar-title>今月の支出</v-toolbar-title>
-          <v-spacer></v-spacer>
-          124000 円
-        </v-toolbar>
-      </v-col>
-    </v-row>
     <v-row justify="center">
-      <v-col cols="9" sm="9" class="mt-3">
+      <v-col cols="9" sm="9" class="mt-5">
         家計簿検索<br /><v-divider />
       </v-col>
       <v-col cols="10" sm="4">

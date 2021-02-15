@@ -1,8 +1,10 @@
 import store from "@/store/index";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Book from "../views/Book.vue";
+import Book from "../components/Book.vue";
+import Setting from "../components/Setting.vue";
 import Home from "../views/Home.vue";
+import Household from "../views/Household.vue";
 import Login from "../views/Login.vue";
 
 Vue.use(VueRouter);
@@ -19,9 +21,20 @@ const routes = [
     component: Login
   },
   {
-    path: "/household/book",
-    name: "Book",
-    component: Book
+    path: "/household",
+    component: Household,
+    children: [
+      {
+        path: "book",
+        name: "book",
+        component: Book
+      },
+      {
+        path: "setting",
+        name: "setting",
+        component: Setting
+      }
+    ]
   }
 ];
 

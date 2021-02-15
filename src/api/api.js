@@ -41,12 +41,16 @@ class FamabonApi {
   /**
    * PUT Request
    */
-  put() {}
+  put(url, body) {
+    return this.api.put(url, body);
+  }
 
   /**
    * DELETE Request
    */
-  delete() {}
+  delete(url) {
+    return this.api.delete(url);
+  }
 }
 
 export { FamabonApi };
