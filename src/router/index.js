@@ -6,6 +6,7 @@ import Setting from "../components/Setting.vue";
 import Home from "../views/Home.vue";
 import Household from "../views/Household.vue";
 import Login from "../views/Login.vue";
+import Statistics from "../views/Statistics.vue";
 
 Vue.use(VueRouter);
 
@@ -35,6 +36,11 @@ const routes = [
         component: Setting
       }
     ]
+  },
+  {
+    path: "/statistics",
+    component: Statistics,
+    name: "statistics"
   }
 ];
 

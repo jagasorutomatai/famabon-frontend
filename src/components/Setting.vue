@@ -10,7 +10,7 @@
         </v-btn>
       </v-col>
       <v-col cols="9" sm="9">
-        <v-data-table :headers="headers" :items="tagList" :items-per-page="10">
+        <v-data-table :headers="headers" :items="tagList" hide-default-footer>
           <template v-slot:[`item.color`]="{ item }">
             <v-chip :color="item.color" text-color="white" small>
               <v-avatar left>
@@ -34,7 +34,11 @@
           </template>
         </v-data-table>
         <!-- 作成+編集用のダイアログボックス -->
-        <v-dialog v-model="dialog_edit" max-width="500px">
+        <v-dialog
+          v-model="dialog_edit"
+          @click:outside="cancel()"
+          max-width="500px"
+        >
           <v-card outlined>
             <v-card-title>タグの作成/編集</v-card-title>
             <v-card-subtitle>
@@ -85,12 +89,13 @@
           </v-card>
         </v-dialog>
         <!-- 削除用のダイアログボックス -->
-        <v-dialog v-model="dialog_delete" max-width="500px">
+        <v-dialog
+          v-model="dialog_delete"
+          @click:outside="cancel()"
+          max-width="500px"
+        >
           <v-card>
             <v-card-title>タグの削除</v-card-title>
-            <v-card-subtitle>
-              タブの削除ができます。削除したタグを設定した帳簿は消えません。
-            </v-card-subtitle>
             <v-card-text>
               <span class="mr-5">削除するタグ</span>
               <strong class="red--text">{{ form.name }}</strong>
@@ -119,10 +124,10 @@ export default {
       "red",
       "pink",
       "purple",
-      "deep-purple",
-      "indigo",
       "blue",
-      "light-blue"
+      "green",
+      "orange",
+      "brown"
     ],
     form: {
       id: "",
@@ -150,6 +155,7 @@ export default {
     cancel() {
       this.dialog_edit = false;
       this.dialog_delete = false;
+      this.form = { id: "", name: "", color: "grey" };
     },
     createTag() {
       this.$store
