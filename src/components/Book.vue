@@ -20,16 +20,16 @@
           </template>
           <template v-slot:[`item.tag`]="{ item }">
             <v-chip
-              v-if="item.tag[0]"
+              v-if="item.tag"
               class="ma-2"
-              :color="item.tag[0].color"
+              :color="item.tag.color"
               text-color="white"
               small
             >
               <v-avatar left>
                 <v-icon small>mdi-tag</v-icon>
               </v-avatar>
-              {{ item.tag[0].name }}
+              {{ item.tag.name }}
             </v-chip>
           </template>
         </v-data-table>
@@ -46,16 +46,16 @@
           </template>
           <template v-slot:[`item.tag`]="{ item }">
             <v-chip
-              v-if="item.tag[0]"
+              v-if="item.tag"
               class="ma-2"
-              :color="item.tag[0].color"
+              :color="item.tag.color"
               text-color="white"
               small
             >
               <v-avatar left>
                 <v-icon small>mdi-tag</v-icon>
               </v-avatar>
-              {{ item.tag[0].name }}
+              {{ item.tag.name }}
             </v-chip>
           </template>
         </v-data-table>
@@ -72,16 +72,16 @@
           </template>
           <template v-slot:[`item.tag`]="{ item }">
             <v-chip
-              v-if="item.tag[0]"
+              v-if="item.tag"
               class="ma-2"
-              :color="item.tag[0].color"
+              :color="item.tag.color"
               text-color="white"
               small
             >
               <v-avatar left>
                 <v-icon small>mdi-tag</v-icon>
               </v-avatar>
-              {{ item.tag[0].name }}
+              {{ item.tag.name }}
             </v-chip>
           </template>
         </v-data-table>

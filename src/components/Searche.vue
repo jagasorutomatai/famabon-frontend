@@ -1,6 +1,8 @@
 <template>
   <v-row justify="center">
-    <v-col cols="9" sm="9" class="mt-5"> 家計簿検索<br /><v-divider /> </v-col>
+    <v-col cols="9" sm="9" class="mt-5">
+      家計簿を検索<br /><v-divider />
+    </v-col>
     <v-col cols="10" sm="4">
       <v-text-field
         v-model="form.title"

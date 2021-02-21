@@ -45,6 +45,22 @@ const getters = {
       tag_list.push(tag.name);
     }
     return tag_list;
+  },
+
+  /**
+   * 統計用のタグを返す
+   */
+  getTagListForStatistics: state => {
+    let tag_list = [];
+    for (let tag of state.tag_list) {
+      tag_list.push({
+        id: tag.id,
+        name: tag.name,
+        color: tag.color,
+        total: 4300
+      });
+    }
+    return tag_list;
   }
 };
 

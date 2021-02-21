@@ -1,5 +1,9 @@
 import { FamabonApi } from "@/api/api.js";
 import Cookies from "js-cookie";
+import moment from "moment";
+import "moment/locale/ja";
+
+moment.locale("ja");
 
 const state = () => ({
   book_list_all: [],
@@ -16,7 +20,9 @@ const getters = {
   },
   getBookListSearched: state => {
     return state.book_list_searched;
-  }
+  },
+  // eslint-disable-next-line no-unused-vars
+  getBookListForLineChart: state => {}
 };
 
 const actions = {
@@ -42,16 +48,13 @@ const actions = {
    */
   restApiGetBookListThisMonth({ commit }) {
     let famabonApi = new FamabonApi();
-    let date = new Date();
 
-    date.setDate(1);
-    let date_after =
-      date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-
-    date.setMonth(date.getMonth() + 1);
-    date.setDate(0);
-    let date_before =
-      date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    let date_after = moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    let date_before = moment()
+      .endOf("month")
+      .format("YYYY-MM-DD");
 
     let url =
       "/household/books/?date_after=" +

@@ -18,93 +18,71 @@
     </v-list-item>
     <v-divider></v-divider>
     <v-list nav dense>
-      <v-list-item link :to="{ name: 'book' }">
-        <v-list-item-icon>
-          <v-icon>mdi-book-open</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>家計簿</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-list-group
-        v-for="item in items"
-        :key="item.title"
-        v-model="item.active"
-        :prepend-icon="item.icon"
-        no-action
-      >
+      <v-list-group v-model="active" prepend-icon="mdi-book-open" no-action>
         <template v-slot:activator>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title"></v-list-item-title>
+            <v-list-item-title>家計簿</v-list-item-title>
           </v-list-item-content>
         </template>
-        <v-list-item
-          v-for="child in item.items"
-          :key="child.title"
-          link
-          dense
-          :to="{ name: child.to }"
-        >
-          <v-list-item-icon class="mr-1">
-            <v-icon small :color="child.color">{{ child.icon }}</v-icon>
-          </v-list-item-icon>
+        <v-list-item link dense :to="{ name: 'book' }">
           <v-list-item-content>
-            <v-list-item-title v-text="child.title"></v-list-item-title>
+            <v-list-item-title>
+              <v-icon class="mr-3" left small>mdi-account</v-icon>帳簿検索
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link dense :to="{ name: 'setting' }">
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon class="mr-3" left small>mdi-tag</v-icon>タグの設定
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
-      <v-list-item link :to="{ name: 'setting' }">
+      <v-list-item
+        link
+        :to="{
+          name: 'statistics',
+          query: {
+            date: '2021年2月',
+            date_after: '2021-02-01',
+            date_before: '2021-02-28'
+          }
+        }"
+      >
         <v-list-item-icon>
-          <v-icon>mdi-book-open</v-icon>
+          <v-icon>mdi-chart-bar</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>設定</v-list-item-title>
+          <v-list-item-title>統計</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
+      <v-list-group prepend-icon="mdi-account" no-action>
+        <template v-slot:activator>
+          <v-list-item-content>
+            <v-list-item-title>アカウント</v-list-item-title>
+          </v-list-item-content>
+        </template>
+        <v-list-item link dense :to="{ name: 'book' }">
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon class="mr-3" left small>mdi-account</v-icon>
+              設定
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-group>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      selectedItem: 0,
-      items: [
-        {
-          icon: "mdi-chart-bar",
-          active: true,
-          items: [
-            {
-              title: "Breakfast & brunch",
-              icon: "mdi-tag",
-              color: "blue",
-              to: "",
-              value: ""
-            },
-            {
-              title: "New American",
-              icon: "mdi-tag",
-              color: "blue",
-              to: "",
-              value: ""
-            },
-            {
-              title: "Sushi",
-              icon: "mdi-tag",
-              color: "blue",
-              to: "",
-              value: ""
-            }
-          ],
-          title: "統計",
-          to: "",
-          value: ""
-        }
-      ],
-      right: null
-    };
-  }
+  data: () => ({
+    active: true,
+    selectedItem: 0,
+    right: null
+  })
 };
 </script>
 
