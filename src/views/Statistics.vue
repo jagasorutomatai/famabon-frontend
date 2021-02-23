@@ -74,10 +74,10 @@
 </template>
 
 <script>
-import LineChart from "../components/LineChart.vue";
-import PieChart from "../components/PieChart.vue";
-import BarChart from "../components/BarChart.vue";
-import Total from "../components/Total.vue";
+import LineChart from "../components/statistics/LineChart.vue";
+import PieChart from "../components/statistics/PieChart.vue";
+import BarChart from "../components/statistics/BarChart.vue";
+import Total from "../components/statistics/Total.vue";
 import lineChartMixin from "../mixins/lineChartMixin";
 import pieChartMixin from "../mixins/pieChartMixin";
 import barChartMixin from "../mixins/barChartMixin";

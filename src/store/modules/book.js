@@ -8,7 +8,8 @@ moment.locale("ja");
 const state = () => ({
   book_list_all: [],
   book_list_this_month: [],
-  book_list_searched: []
+  book_list_searched: [],
+  book_detail: []
 });
 
 const getters = {
@@ -21,11 +22,48 @@ const getters = {
   getBookListSearched: state => {
     return state.book_list_searched;
   },
-  // eslint-disable-next-line no-unused-vars
-  getBookListForLineChart: state => {}
+  getBookDetail: state => {
+    return state.book_detail;
+  }
 };
 
 const actions = {
+  /**
+   * 帳簿を作成する処理
+   */
+  // eslint-disable-next-line no-unused-vars
+  createBook({ commit }, payload) {
+    let famabonApi = new FamabonApi();
+    let url = "/household/books/";
+    famabonApi.setRequestHeader(Cookies.get("access"));
+    return famabonApi.post(url, payload);
+  },
+
+  /**
+   *
+   * 帳簿を更新する処理
+   */
+  // eslint-disable-next-line no-unused-vars
+  updateBook({ commit }, payload) {
+    let famabonApi = new FamabonApi();
+    let url = "/household/books/" + payload.id + "/";
+    delete payload["id"];
+    famabonApi.setRequestHeader(Cookies.get("access"));
+    return famabonApi.put(url, payload);
+  },
+
+  /**
+   *
+   * 帳簿を削除する処理
+   */
+  // eslint-disable-next-line no-unused-vars
+  deleteBook({ commit }, payload) {
+    let famabonApi = new FamabonApi();
+    let url = "/household/books/" + payload.id + "/";
+    famabonApi.setRequestHeader(Cookies.get("access"));
+    return famabonApi.delete(url);
+  },
+
   /**
    * 帳簿リストを取得する処理
    */
@@ -37,6 +75,23 @@ const actions = {
       .get(url)
       .then(response => {
         commit("changeBookListAll", { book_list_all: response["data"] });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  },
+
+  /**
+   * 帳簿を取得する処理(個別)
+   */
+  restApiGetBookDetail({ commit }, payload) {
+    let famabonApi = new FamabonApi();
+    let url = "/household/books/" + payload.id + "/";
+    famabonApi.setRequestHeader(Cookies.get("access"));
+    return famabonApi
+      .get(url)
+      .then(response => {
+        commit("changeBookDetail", { book_detail: response["data"] });
       })
       .catch(error => {
         console.log(error);
@@ -117,6 +172,9 @@ const mutations = {
   },
   changeBookListSearched(state, payload) {
     state.book_list_searched = payload.book_list_searched;
+  },
+  changeBookDetail(state, payload) {
+    state.book_detail = payload.book_detail;
   }
 };
 

@@ -7,7 +7,13 @@
           家計簿を記入する↓
         </v-list-item-subtitle>
         <v-list-item-action>
-          <v-btn block color="info" depressed>
+          <v-btn
+            block
+            color="info"
+            depressed
+            link
+            :to="{ name: 'book_create' }"
+          >
             <v-icon dark left>
               mdi-plus
             </v-icon>

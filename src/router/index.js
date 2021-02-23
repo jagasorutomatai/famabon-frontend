@@ -1,8 +1,11 @@
 import store from "@/store/index";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Book from "../components/Book.vue";
-import Setting from "../components/Setting.vue";
+import Book from "../components/household/pages/Book.vue";
+import BookCreate from "../components/household/pages/BookCreate.vue";
+import BookDetail from "../components/household/pages/BookDetail.vue";
+import BookEdit from "../components/household/pages/BookEdit.vue";
+import Setting from "../components/household/pages/Setting.vue";
 import Home from "../views/Home.vue";
 import Household from "../views/Household.vue";
 import Login from "../views/Login.vue";
@@ -31,6 +34,21 @@ const routes = [
         component: Book
       },
       {
+        path: "book/create",
+        name: "book_create",
+        component: BookCreate
+      },
+      {
+        path: "book/:id",
+        name: "book_detail",
+        component: BookDetail
+      },
+      {
+        path: "book/:id/edit",
+        name: "book_edit",
+        component: BookEdit
+      },
+      {
         path: "setting",
         name: "setting",
         component: Setting
@@ -38,7 +56,7 @@ const routes = [
     ]
   },
   {
-    path: "/statistics",
+    path: "/household/statistics",
     component: Statistics,
     name: "statistics"
   }
