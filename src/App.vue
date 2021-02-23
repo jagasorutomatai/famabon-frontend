@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import Footer from "./components/Footer";
-import Header from "./components/Header";
-import SideMenu from "./components/SideMenu";
+import Footer from "./components/layout/Footer";
+import Header from "./components/layout/Header";
+import SideMenu from "./components/layout/SideMenu";
 import Login from "./views/Login";
 
 export default {
