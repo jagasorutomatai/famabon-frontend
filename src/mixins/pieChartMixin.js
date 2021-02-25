@@ -1,3 +1,8 @@
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
 export default {
   data: () => ({
     pie_chart_data: { labels: [], datasets: [] },
@@ -5,19 +10,30 @@ export default {
   }),
   methods: {
     async initPieChart() {
+      api.setRequestHeader(Cookies.get("access"));
+
       let date_after = this.$route.query.date_after;
       let date_before = this.$route.query.date_before;
-
       if (
         typeof date_after != "undefined" &&
         typeof date_before != "undefined"
       ) {
-        await this.$store.dispatch("statistics/restApiGetTotalByTag", {
-          date_after: this.$route.query.date_after,
-          date_before: this.$route.query.date_before
-        });
+        await api
+          .getFilterTotalByTag({
+            date_after: this.$route.query.date_after,
+            date_before: this.$route.query.date_before
+          })
+          .then(response => {
+            this.$store.dispatch("statistics/dispatchTotalByTag", {
+              total_by_tag: response.data
+            });
+          });
       } else {
-        await this.$store.dispatch("statistics/restApiGetTotalByTag");
+        await api.getTotalByTag().then(response => {
+          this.$store.dispatch("statistics/dispatchTotalByTag", {
+            total_by_tag: response.data
+          });
+        });
       }
 
       let labels = this.$store.getters["statistics/getTotalByTagLabels"];

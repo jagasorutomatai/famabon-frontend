@@ -2,95 +2,111 @@
   <div>
     <v-form>
       <v-row justify="center">
-        <v-col cols="9" sm="9" class="mt-5">
-          帳簿編集<br /><v-divider />
-        </v-col>
-        <v-col cols="9" sm="9" class="mt-5">
-          <v-text-field
-            v-model="form.title"
-            label="タイトル"
-            placeholder="Placeholder"
-            outlined
-            dense
-          ></v-text-field>
-          <v-textarea
-            v-model="form.description"
-            outlined
-            label="説明"
-            rows="7"
-          ></v-textarea>
-
-          <v-text-field
-            v-model="form.money"
-            label="金額"
-            placeholder="Placeholder"
-            outlined
-            dense
-          ></v-text-field>
-
-          <v-menu
-            ref="menu"
-            v-model="menu"
-            :close-on-content-click="false"
-            :return-value.sync="form.date_after"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template v-slot:activator="{ on, attrs }">
+        <v-col cols="8" sm="8" class="mt-5">
+          <v-card outlined class="pa-3">
+            <v-card-title>帳簿編集</v-card-title>
+            <v-card-actions>
               <v-text-field
-                label="日付"
-                dense
+                v-model="form.title"
+                label="タイトル"
+                placeholder="Placeholder"
                 outlined
-                v-model="form.date"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
+                dense
+                :error="this.error_messages['title'] ? true : false"
+                :error-messages="this.error_messages['title']"
               ></v-text-field>
-            </template>
-            <v-date-picker v-model="form.date" no-title scrollable>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="menu = false">
+            </v-card-actions>
+            <v-card-actions>
+              <v-textarea
+                v-model="form.description"
+                outlined
+                label="説明"
+                :error="this.error_messages['description'] ? true : false"
+                :error-messages="this.error_messages['description']"
+              ></v-textarea>
+            </v-card-actions>
+            <v-card-actions>
+              <v-text-field
+                v-model="form.money"
+                label="金額"
+                placeholder="Placeholder"
+                outlined
+                dense
+                :error="this.error_messages['money'] ? true : false"
+                :error-messages="this.error_messages['money']"
+              ></v-text-field>
+            </v-card-actions>
+            <v-card-actions>
+              <v-menu
+                ref="menu"
+                v-model="menu"
+                :close-on-content-click="false"
+                :return-value.sync="form.date_after"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    label="日付"
+                    dense
+                    outlined
+                    v-model="form.date"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="form.date" no-title scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="menu = false">
+                    キャンセル
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.menu.save(form.date)"
+                  >
+                    決定
+                  </v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-card-actions>
+            <v-card-actions>
+              <v-select
+                v-model="form.tag_uuid"
+                dense
+                :items="tag_list"
+                item-text="name"
+                item-value="uuid"
+                label="タグ"
+                outlined
+                :error="this.error_messages['tag_uuid'] ? true : false"
+                :error-messages="this.error_messages['tag_uuid']"
+              ></v-select>
+            </v-card-actions>
+            <v-card-actions>
+              <v-btn
+                @click="update()"
+                class="mr-1"
+                color="info"
+                width="95px"
+                depressed
+              >
+                更新
+              </v-btn>
+              <v-btn
+                @click="cancel()"
+                class="ml-1"
+                color="secondary"
+                width="95px"
+                depressed
+              >
                 キャンセル
               </v-btn>
-              <v-btn text color="primary" @click="$refs.menu.save(form.date)">
-                決定
-              </v-btn>
-            </v-date-picker>
-          </v-menu>
-
-          <v-select
-            v-model="form.tag_uid"
-            dense
-            :items="tag_list"
-            item-text="name"
-            item-value="id"
-            label="タグ"
-            outlined
-          ></v-select>
-        </v-col>
-        <v-col class="text-right" cols="10" sm="5">
-          <v-btn
-            @click="update()"
-            class="mr-1"
-            color="info"
-            width="95px"
-            depressed
-          >
-            更新
-          </v-btn>
-        </v-col>
-        <v-col class="text-left" cols="10" sm="5">
-          <v-btn
-            @click="cancel()"
-            class="ml-1"
-            color="secondary"
-            width="95px"
-            depressed
-          >
-            キャンセル
-          </v-btn>
+            </v-card-actions>
+          </v-card>
         </v-col>
       </v-row>
     </v-form>
@@ -98,35 +114,74 @@
 </template>
 
 <script>
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
 export default {
   data: () => ({
     menu: false,
     form: {
-      id: "",
+      uuid: "",
       title: "",
       description: "",
-      money: 0,
-      tag_uid: "",
-      account_id: 1,
-      date: ""
-    }
+      money: undefined,
+      tag_uuid: undefined,
+      account_uuid: Cookies.get("account_uuid"),
+      date: new Date().toISOString().substr(0, 10)
+    },
+    error_messages: {}
   }),
   methods: {
+    async initBookEdit() {
+      api.setRequestHeader(Cookies.get("access"));
+
+      // 更新用の帳簿データを取得
+      let uuid = this.$route.params["uuid"];
+      await api.getBookDetail({ uuid: uuid }).then(response => {
+        this.$store.dispatch("book/dispatchBookDetail", {
+          book_detail: response["data"]
+        });
+        this.book_detail = this.$store.getters["book/getBookDetail"];
+      });
+
+      let book_detail = this.$store.getters["book/getBookDetail"];
+      this.form = {
+        uuid: book_detail.uuid,
+        title: book_detail.title,
+        description: book_detail.description,
+        money: book_detail.money,
+        tag_uuid: book_detail.tag.uuid,
+        account_uuid: book_detail.account,
+        date: book_detail.date
+      };
+
+      // セレクタ用のタグデータを取得
+      api.getTagList().then(response => {
+        this.$store.dispatch("tag/dispatchTagList", {
+          tag_list: response["data"]
+        });
+      });
+    },
     update() {
-      this.$store
-        .dispatch("book/updateBook", this.form)
+      console.log(this.form);
+      api
+        .updateBook(this.form)
         .then(response => {
           if (response.status == "200") {
+            this.error_messages = {};
             this.$router.push({ name: "book" });
           }
         })
         .catch(error => {
-          console.log(error);
+          this.error_messages = error.response.data;
         });
     },
     cancel() {
-      let id = this.$route.params["id"];
-      this.$router.push({ name: "book_detail", params: { id: id } });
+      this.error_messages = {};
+      let uuid = this.$route.params["uuid"];
+      this.$router.push({ name: "book_detail", params: { uuid: uuid } });
     }
   },
   computed: {
@@ -134,19 +189,8 @@ export default {
       return this.$store.getters["tag/getTagList"];
     }
   },
-  async mounted() {
-    let id = this.$route.params["id"];
-    await this.$store.dispatch("book/restApiGetBookDetail", { id: id });
-    let book_detail = this.$store.getters["book/getBookDetail"];
-    this.form = {
-      id: book_detail.id,
-      title: book_detail.title,
-      description: book_detail.description,
-      money: book_detail.money,
-      tag_uid: book_detail.tag.id,
-      account_id: book_detail.account,
-      date: book_detail.date
-    };
+  mounted() {
+    this.initBookEdit();
   }
 };
 </script>

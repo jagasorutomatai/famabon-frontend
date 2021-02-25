@@ -9,13 +9,13 @@
     <v-divider></v-divider>
     <v-tabs-items v-model="tab">
       <v-tab-item>
-        <BookListTable :book_list="bookListAll" />
+        <BookListTable :book_list="bookList" />
       </v-tab-item>
       <v-tab-item>
-        <BookListTable :book_list="bookListThisMonth" />
+        <BookListTable :book_list="CurrentBookList" />
       </v-tab-item>
       <v-tab-item>
-        <BookListTable :book_list="bookListSearched" />
+        <BookListTable :book_list="SearchedbookList" />
       </v-tab-item>
     </v-tabs-items>
   </div>
@@ -24,6 +24,13 @@
 <script>
 import Search from "../Searche.vue";
 import BookListTable from "../BookListTable.vue";
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+import moment from "moment";
+import "moment/locale/ja";
+
+const api = new FamabonApi();
+moment.locale("ja");
 
 export default {
   components: {
@@ -34,20 +41,50 @@ export default {
     tab: null
   }),
   computed: {
-    bookListAll() {
-      return this.$store.getters["book/getBookListAll"];
+    bookList() {
+      return this.$store.getters["book/getBookList"];
     },
-    bookListThisMonth() {
-      return this.$store.getters["book/getBookListThisMonth"];
+    CurrentBookList() {
+      return this.$store.getters["book/getCurrentBookList"];
     },
-    bookListSearched() {
-      return this.$store.getters["book/getBookListSearched"];
+    SearchedbookList() {
+      return this.$store.getters["book/getSearchedBookList"];
     }
   },
   watch: {
-    bookListSearched() {
+    SearchedbookList() {
       this.tab = 2;
     }
+  },
+  mounted() {
+    // jwtをRequestヘッダーに設定する
+    api.setRequestHeader(Cookies.get("access"));
+
+    // 今月の月初と月末を取得する
+    let date_after = moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    let date_before = moment()
+      .endOf("month")
+      .format("YYYY-MM-DD");
+
+    api.getBookList().then(response => {
+      this.$store.dispatch("book/dispatchBookList", {
+        book_list: response["data"]
+      });
+    });
+    api
+      .getFilterBookList({
+        title: "",
+        date_after: date_after,
+        date_before: date_before,
+        tag: ""
+      })
+      .then(response => {
+        this.$store.dispatch("book/dispatchCurrentBookList", {
+          current_book_list: response["data"]
+        });
+      });
   }
 };
 </script>

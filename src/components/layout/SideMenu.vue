@@ -69,7 +69,11 @@
             <v-list-item-title>アカウント</v-list-item-title>
           </v-list-item-content>
         </template>
-        <v-list-item link dense :to="{ name: 'book' }">
+        <v-list-item
+          link
+          dense
+          :to="{ name: 'account_detail', params: { uuid: uuid } }"
+        >
           <v-list-item-content>
             <v-list-item-title>
               <v-icon class="mr-3" left small>mdi-account</v-icon>
@@ -83,12 +87,18 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
 export default {
   data: () => ({
     active: true,
     selectedItem: 0,
     right: null
-  })
+  }),
+  computed: {
+    uuid() {
+      return Cookies.get("account_uuid");
+    }
+  }
 };
 </script>
 

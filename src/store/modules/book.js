@@ -1,26 +1,24 @@
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/ja";
 
 moment.locale("ja");
 
 const state = () => ({
-  book_list_all: [],
-  book_list_this_month: [],
-  book_list_searched: [],
+  book_list: [],
+  current_book_list: [],
+  searched_book_list: [],
   book_detail: []
 });
 
 const getters = {
-  getBookListAll: state => {
-    return state.book_list_all;
+  getBookList: state => {
+    return state.book_list;
   },
-  getBookListThisMonth: state => {
-    return state.book_list_this_month;
+  getCurrentBookList: state => {
+    return state.current_book_list;
   },
-  getBookListSearched: state => {
-    return state.book_list_searched;
+  getSearchedBookList: state => {
+    return state.searched_book_list;
   },
   getBookDetail: state => {
     return state.book_detail;
@@ -28,153 +26,41 @@ const getters = {
 };
 
 const actions = {
-  /**
-   * 帳簿を作成する処理
-   */
-  // eslint-disable-next-line no-unused-vars
-  createBook({ commit }, payload) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/";
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi.post(url, payload);
+  dispatchBookList({ commit }, payload) {
+    commit("changeBookList", payload);
   },
-
-  /**
-   *
-   * 帳簿を更新する処理
-   */
-  // eslint-disable-next-line no-unused-vars
-  updateBook({ commit }, payload) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/" + payload.id + "/";
-    delete payload["id"];
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi.put(url, payload);
+  dispatchBookDetail({ commit }, payload) {
+    commit("changeBookDetail", payload);
   },
-
-  /**
-   *
-   * 帳簿を削除する処理
-   */
-  // eslint-disable-next-line no-unused-vars
-  deleteBook({ commit }, payload) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/" + payload.id + "/";
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi.delete(url);
+  dispatchCurrentBookList({ commit }, payload) {
+    commit("changeCurrentBookList", payload);
   },
-
-  /**
-   * 帳簿リストを取得する処理
-   */
-  restApiGetBookListAll({ commit }) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/";
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeBookListAll", { book_list_all: response["data"] });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  dispatchSearchedBookList({ commit }, payload) {
+    commit("changeSearchedBookList", payload);
   },
-
-  /**
-   * 帳簿を取得する処理(個別)
-   */
-  restApiGetBookDetail({ commit }, payload) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/" + payload.id + "/";
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeBookDetail", { book_detail: response["data"] });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
-
-  /**
-   * 今月分の帳簿を取得する処理
-   */
-  restApiGetBookListThisMonth({ commit }) {
-    let famabonApi = new FamabonApi();
-
-    let date_after = moment()
-      .startOf("month")
-      .format("YYYY-MM-DD");
-    let date_before = moment()
-      .endOf("month")
-      .format("YYYY-MM-DD");
-
-    let url =
-      "/household/books/?date_after=" +
-      date_after +
-      "&date_before=" +
-      date_before;
-
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeBookListThisMonth", {
-          book_list_this_month: response["data"]
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
-
-  /**
-   * フィルターした帳簿リストを取得する処理
-   */
-  restApiGetFilterBookList({ commit }, payload) {
-    console.log(payload);
-    let famabonApi = new FamabonApi();
-    let title = "title=" + payload.title;
-    let date_after = "date_after=" + payload.date_after;
-    let date_before = "date_before=" + payload.date_before;
-    let tag = "tag=" + payload.tag;
-    let url =
-      "/household/books/?" +
-      title +
-      "&" +
-      date_after +
-      "&" +
-      date_before +
-      "&" +
-      tag;
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeBookListSearched", {
-          book_list_searched: response["data"]
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  reset({ commit }) {
+    commit("reset");
   }
 };
 
 const mutations = {
-  changeBookListAll(state, payload) {
-    state.book_list_all = payload.book_list_all;
+  changeBookList(state, payload) {
+    state.book_list = payload.book_list;
   },
-  changeBookListThisMonth(state, payload) {
-    state.book_list_this_month = payload.book_list_this_month;
+  changeCurrentBookList(state, payload) {
+    state.current_book_list = payload.current_book_list;
   },
-  changeBookListSearched(state, payload) {
-    state.book_list_searched = payload.book_list_searched;
+  changeSearchedBookList(state, payload) {
+    state.searched_book_list = payload.searched_book_list;
   },
   changeBookDetail(state, payload) {
     state.book_detail = payload.book_detail;
+  },
+  reset(state) {
+    state.book_list = [];
+    state.current_book_list = [];
+    state.searched_book_list = [];
+    state.book_detail = [];
   }
 };
 

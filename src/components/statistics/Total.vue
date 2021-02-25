@@ -23,6 +23,11 @@
 </template>
 
 <script>
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
 export default {
   data: () => ({
     total: 0,
@@ -30,23 +35,44 @@ export default {
   }),
   methods: {
     async initTotal() {
+      api.setRequestHeader(Cookies.get("access"));
       let date_after = this.$route.query.date_after;
       let date_before = this.$route.query.date_before;
       if (
         typeof date_after != "undefined" &&
         typeof date_before != "undefined"
       ) {
-        await this.$store.dispatch("statistics/restApiGetTotalByTag", {
-          date_after: this.$route.query.date_after,
-          date_before: this.$route.query.date_before
-        });
-        await this.$store.dispatch("statistics/restApiGetTotal", {
-          date_after: this.$route.query.date_after,
-          date_before: this.$route.query.date_before
-        });
+        await api
+          .getFilterTotalByTag({
+            date_after: this.$route.query.date_after,
+            date_before: this.$route.query.date_before
+          })
+          .then(response => {
+            this.$store.dispatch("statistics/dispatchTotalByTag", {
+              total_by_tag: response.data
+            });
+          });
+        await api
+          .getFilterTotal({
+            date_after: this.$route.query.date_after,
+            date_before: this.$route.query.date_before
+          })
+          .then(response => {
+            this.$store.dispatch("statistics/dispatchTotal", {
+              total: response.data.total
+            });
+          });
       } else {
-        await this.$store.dispatch("statistics/restApiGetTotalByTag");
-        await this.$store.dispatch("statistics/restApiGetTotal");
+        await api.getTotalByTag().then(response => {
+          this.$store.dispatch("statistics/dispatchTotalByTag", {
+            total_by_tag: response.data
+          });
+        });
+        await api.getTotal().then(response => {
+          this.$store.dispatch("statistics/dispatchTotal", {
+            total: response.data.total
+          });
+        });
       }
       this.total = this.$store.getters["statistics/getTotal"];
       this.total_by_tag = this.$store.getters["statistics/getTotalByTag"];

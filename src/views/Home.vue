@@ -13,7 +13,7 @@ export default {
       let access = Cookies.get("access");
       let result = this.parseJwt(access);
       console.log(result);
-      Cookies.set("account_uid", result.account_id);
+      Cookies.set("account_uuid", result.account_uuid);
       console.log(result);
     },
     parseJwt(token) {
