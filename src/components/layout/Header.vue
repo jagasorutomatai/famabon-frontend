@@ -1,20 +1,63 @@
 <template>
-  <v-app-bar app clipped-left dense flat dark>
+  <v-app-bar src="logo.png" app clipped-left dense flat dark>
     <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-    <v-toolbar-title>famabon</v-toolbar-title>
-
-    <v-spacer></v-spacer>
-
-    <span>
-      <v-icon left>mdi-account</v-icon>
-      admin
-    </span>
+    <v-toolbar-title>
+      <v-icon left class="mb-1">
+        mdi-book-open-page-variant-outline
+      </v-icon>
+      famabon
+    </v-toolbar-title>
+    <v-spacer />
+    <v-chip class="ma-2" dark label>
+      <v-icon left>
+        mdi-account-circle-outline
+      </v-icon>
+      {{ account_username }}
+    </v-chip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn icon v-bind="attrs" v-on="on">
+          <v-icon>mdi-help-circle-outline</v-icon>
+        </v-btn>
+      </template>
+      <span>ヘルプ</span>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn icon v-bind="attrs" v-on="on" @click="toGitHubPage()">
+          <v-icon>mdi-github</v-icon>
+        </v-btn>
+      </template>
+      <span>本アプリケーションのレポジトリ</span>
+    </v-tooltip>
   </v-app-bar>
 </template>
 
 <script>
-export default {};
+import Cookies from "js-cookie";
+
+export default {
+  data: () => ({
+    account_username: ""
+  }),
+  methods: {
+    initHeader() {
+      this.account_username = Cookies.get("account_username");
+    },
+    toGitHubPage() {
+      let url = "https://github.com/jagasorutomatai/famabon-frontend";
+      window.open(url, "_blank");
+    }
+  },
+  watch: {
+    $route() {
+      this.initHeader();
+    }
+  },
+  mounted() {
+    this.initHeader();
+  }
+};
 </script>
 
 <style></style>

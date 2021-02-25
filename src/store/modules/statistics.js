@@ -1,5 +1,3 @@
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/ja";
 
@@ -93,93 +91,20 @@ const actions = {
   /**
    * 帳簿の合計を取得する処理
    */
-  restApiGetTotal({ commit }, payload = null) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/total/";
-
-    // URLクエリパラメータが存在する場合の処理
-    if (payload != null) {
-      let date_after = "date_after=" + payload.date_after;
-      let date_before = "date_before=" + payload.date_before;
-      url = url + "?" + date_after + "&" + date_before;
-    }
-
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeTotal", { total: response.data.total });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  dispatchTotal({ commit }, payload) {
+    commit("changeTotal", payload);
   },
 
-  /**
-   * 帳簿の日別の合計一覧を取得する処理
-   */
-  restApiGetTotalByDate({ commit }, payload = null) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/totalByDate/";
-
-    // URLクエリパラメータが存在する場合の処理
-    if (payload != null) {
-      let date_after = "date_after=" + payload.date_after;
-      let date_before = "date_before=" + payload.date_before;
-      url = url + "?" + date_after + "&" + date_before;
-    }
-
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("changeTotalByDate", { total_by_date: response.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  dispatchTotalByDate({ commit }, payload) {
+    commit("changeTotalByDate", payload);
   },
 
-  /**
-   * タグ別の合計一覧を取得する処理
-   */
-  restApiGetTotalByTag({ commit }, payload = null) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/totalByTag/";
-
-    // URLクエリパラメータが存在する場合の処理
-    if (payload != null) {
-      let date_after = "date_after=" + payload.date_after;
-      let date_before = "date_before=" + payload.date_before;
-      url = url + "?" + date_after + "&" + date_before;
-    }
-
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("chageTotalByTag", { total_by_tag: response.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  dispatchTotalByTag({ commit }, payload) {
+    commit("chageTotalByTag", payload);
   },
 
-  /**
-   * 全帳簿の日付一覧を取得する処理
-   */
-  restApiGetPeriod({ commit }) {
-    let famabonApi = new FamabonApi();
-    let url = "/household/books/period/";
-    famabonApi.setRequestHeader(Cookies.get("access"));
-    return famabonApi
-      .get(url)
-      .then(response => {
-        commit("chagePeriod", { period: response.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  dispatchPeriod({ commit }, payload) {
+    commit("chagePeriod", payload);
   }
 };
 

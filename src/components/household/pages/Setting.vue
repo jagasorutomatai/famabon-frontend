@@ -50,6 +50,8 @@
               dense
               label="タグの名前"
               outlined
+              :error="this.error_messages['name'] ? true : false"
+              :error-messages="this.error_messages['name']"
             ></v-text-field>
             <v-select
               v-model="form.color"
@@ -112,98 +114,122 @@
 </template>
 
 <script>
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
+const color_list = [
+  "grey",
+  "red",
+  "pink",
+  "purple",
+  "blue",
+  "green",
+  "orange",
+  "brown"
+];
+const headers = [
+  { text: "タグの名前", value: "name" },
+  { text: "タグの色", value: "color" },
+  { text: "編集/削除", value: "actions" }
+];
 export default {
   data: () => ({
-    headers: [
-      { text: "タグの名前", value: "name" },
-      { text: "タグの色", value: "color" },
-      { text: "編集/削除", value: "actions" }
-    ],
-    color_list: [
-      "grey",
-      "red",
-      "pink",
-      "purple",
-      "blue",
-      "green",
-      "orange",
-      "brown"
-    ],
+    headers: headers,
+    color_list: color_list,
     form: {
-      id: "",
+      uuid: "",
       name: "",
-      color: "grey"
+      color: "grey",
+      account_uuid: Cookies.get("account_uuid")
     },
-    tab: null,
     dialog_edit: false,
     dialog_delete: false,
-    method: null
+    method: null,
+    error_messages: {}
   }),
   methods: {
+    initSetting() {
+      api.getTagList().then(response => {
+        this.$store.dispatch("tag/dispatchTagList", {
+          tag_list: response["data"]
+        });
+      });
+    },
     openEditTagDialog(method, item = this.form) {
       this.method = method;
-      this.form.id = item.id;
+      this.form.uuid = item.uuid;
       this.form.name = item.name;
       this.form.color = item.color;
       this.dialog_edit = true;
     },
     openDeleteTagDialog(item) {
-      this.form.id = item.id;
+      this.form.uuid = item.uuid;
       this.form.name = item.name;
       this.dialog_delete = true;
     },
     cancel() {
       this.dialog_edit = false;
       this.dialog_delete = false;
-      this.form = { id: "", name: "", color: "grey" };
+      this.error_messages = {};
+      this.resetForm();
     },
     createTag() {
-      this.$store
-        .dispatch("tag/createTag", this.form)
+      api
+        .createTag(this.form)
         .then(response => {
           if (response.status == "201") {
-            this.$store.dispatch("tag/restApiGetTagList");
-            this.form = { name: "", color: "grey" };
+            this.initSetting();
+            this.resetForm();
+            this.error_messages = {};
             this.dialog_edit = false;
           }
         })
         .catch(error => {
-          console.log(error);
+          this.error_messages = error.response.data;
         });
     },
     updateTag() {
-      this.$store
-        .dispatch("tag/updateTag", this.form)
+      api
+        .updateTag(this.form)
         .then(response => {
           if (response.status == "200") {
-            this.$store.dispatch("tag/restApiGetTagList");
-            this.form = { name: "", color: "grey" };
+            this.initSetting();
+            this.resetForm();
+            this.error_messages = {};
             this.dialog_edit = false;
           }
         })
         .catch(error => {
-          console.log(error);
+          this.error_messages = error.response.data;
         });
     },
     deleteTag() {
-      this.$store
-        .dispatch("tag/deleteTag", this.form)
-        .then(response => {
-          if (response.status == "204") {
-            this.$store.dispatch("tag/restApiGetTagList");
-            this.form = { name: "", color: "grey" };
-            this.dialog_delete = false;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      api.deleteTag(this.form).then(response => {
+        if (response.status == "204") {
+          this.initSetting();
+          this.dialog_delete = false;
+        }
+      });
+    },
+    resetForm() {
+      this.form = {
+        uuid: "",
+        name: "",
+        color: "grey",
+        account_uuid: Cookies.get("account_uuid")
+      };
     }
   },
   computed: {
     tagList() {
       return this.$store.getters["tag/getTagList"];
     }
+  },
+  mounted() {
+    api.setRequestHeader(Cookies.get("access"));
+    this.initSetting();
   }
 };
 </script>

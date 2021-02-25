@@ -1,7 +1,15 @@
 <template>
   <div>
     <v-system-bar window class="mt-5 white">
-      <v-btn small @click="openDialog()" class="mr-3" depressed>期間指定</v-btn>
+      <v-btn
+        small
+        @click="openDialog()"
+        class="mr-3"
+        depressed
+        color="primary"
+        outlined
+        >期間指定</v-btn
+      >
       <v-chip small label class="mr-3" color="primary">
         {{ display_date }}
       </v-chip>
@@ -81,6 +89,10 @@ import Total from "../components/statistics/Total.vue";
 import lineChartMixin from "../mixins/lineChartMixin";
 import pieChartMixin from "../mixins/pieChartMixin";
 import barChartMixin from "../mixins/barChartMixin";
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
 
 export default {
   components: {
@@ -99,6 +111,15 @@ export default {
     }
   },
   methods: {
+    initStatistics() {
+      api.setRequestHeader(Cookies.get("access"));
+      this.display_date = this.$route.query.date;
+      api.getPeriod().then(response => {
+        this.$store.dispatch("statistics/dispatchPeriod", {
+          period: response.data
+        });
+      });
+    },
     changePeriod(item) {
       this.$router.push({
         name: "statistics",
@@ -118,9 +139,8 @@ export default {
       this.display_date = this.$route.query.date;
     }
   },
-  created() {
-    this.display_date = this.$route.query.date;
-    this.$store.dispatch("statistics/restApiGetPeriod");
+  mounted() {
+    this.initStatistics();
   },
   mixins: [lineChartMixin, pieChartMixin, barChartMixin]
 };

@@ -104,6 +104,11 @@
 </template>
 
 <script>
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
 export default {
   data: () => ({
     menu1: false,
@@ -121,8 +126,12 @@ export default {
     }
   },
   methods: {
-    async search() {
-      await this.$store.dispatch("book/restApiGetFilterBookList", this.form);
+    search() {
+      api.getFilterBookList(this.form).then(response => {
+        this.$store.dispatch("book/dispatchSearchedBookList", {
+          searched_book_list: response["data"]
+        });
+      });
     },
     reset() {
       this.$store.commit("book/changeBookListSearched", {
@@ -130,6 +139,15 @@ export default {
       });
       this.form = { title: "", tag: "", date_before: "", date_after: "" };
     }
+  },
+  mounted() {
+    // jwtをRequestヘッダーに設定する
+    api.setRequestHeader(Cookies.get("access"));
+    api.getTagList().then(response => {
+      this.$store.dispatch("tag/dispatchTagList", {
+        tag_list: response["data"]
+      });
+    });
   }
 };
 </script>

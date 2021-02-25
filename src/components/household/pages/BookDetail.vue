@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center">
       <v-col cols="9" sm="9" class="mt-5">
-        <v-card outlined>
+        <v-card outlined class="pa-3">
           <v-card-title>
             <span class="subtitle-1">{{ book_detail.title }}</span>
           </v-card-title>
@@ -82,6 +82,11 @@
 </template>
 
 <script>
+import { FamabonApi } from "@/api/api.js";
+import Cookies from "js-cookie";
+
+const api = new FamabonApi();
+
 export default {
   data: () => ({
     book_detail: {
@@ -96,27 +101,26 @@ export default {
     delete_dialog: false
   }),
   methods: {
-    async initBookDetail() {
-      let id = this.$route.params["id"];
-      await this.$store.dispatch("book/restApiGetBookDetail", { id: id });
-      this.book_detail = this.$store.getters["book/getBookDetail"];
+    initBookDetail() {
+      let uuid = this.$route.params["uuid"];
+      api.getBookDetail({ uuid: uuid }).then(response => {
+        this.$store.dispatch("book/dispatchBookDetail", {
+          book_detail: response["data"]
+        });
+        this.book_detail = this.$store.getters["book/getBookDetail"];
+      });
     },
     toEditBookPage() {
-      let id = this.$route.params["id"];
-      this.$router.push({ name: "book_edit", params: { id: id } });
+      let uuid = this.$route.params["uuid"];
+      this.$router.push({ name: "book_edit", params: { uuid: uuid } });
     },
-    async deleteBook() {
-      let id = this.$route.params["id"];
-      await this.$store
-        .dispatch("book/deleteBook", { id: id })
-        .then(response => {
-          if (response.status == "204") {
-            this.$router.push({ name: "book" });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+    deleteBook() {
+      let uuid = this.$route.params["uuid"];
+      api.deleteBook({ uuid: uuid }).then(response => {
+        if (response.status == "204") {
+          this.$router.push({ name: "book" });
+        }
+      });
     },
     cancel() {
       this.delete_dialog = false;
@@ -128,6 +132,7 @@ export default {
     }
   },
   mounted() {
+    api.setRequestHeader(Cookies.get("access"));
     this.initBookDetail();
   }
 };

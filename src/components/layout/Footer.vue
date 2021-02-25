@@ -2,7 +2,7 @@
   <v-footer app dark padless>
     <v-card class="flex" flat tile>
       <v-card-text class="py-2 white--text text-center">
-        &copy; 2020 Takaaki Hida
+        &copy; 2020
       </v-card-text>
     </v-card>
   </v-footer>

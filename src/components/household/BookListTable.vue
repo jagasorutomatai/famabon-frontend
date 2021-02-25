@@ -35,7 +35,7 @@ export default {
   }),
   methods: {
     openBookDetail(item) {
-      this.$router.push({ name: "book_detail", params: { id: item.id } });
+      this.$router.push({ name: "book_detail", params: { uuid: item.uuid } });
     }
   },
   props: ["book_list"]

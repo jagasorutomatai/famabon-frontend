@@ -1,11 +1,19 @@
 <template>
-  <v-app>
-    <SideMenu v-if="is_logged_in" />
+  <v-app v-if="is_logged_in">
+    <SideMenu />
     <Header />
     <v-main>
       <v-container class="pa-0" fluid style="height: 100%;">
-        <router-view v-if="is_logged_in" />
-        <Login v-else />
+        <router-view />
+      </v-container>
+    </v-main>
+    <Footer />
+  </v-app>
+  <v-app v-else>
+    <Header />
+    <v-main>
+      <v-container class="pa-0" fluid style="height: 100%;">
+        <router-view />
       </v-container>
     </v-main>
     <Footer />
@@ -16,14 +24,12 @@
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
 import SideMenu from "./components/layout/SideMenu";
-import Login from "./views/Login";
 
 export default {
   name: "App",
 
   components: {
     Footer,
-    Login,
     Header,
     SideMenu
   },
