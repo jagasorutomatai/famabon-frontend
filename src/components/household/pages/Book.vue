@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Search />
+    <BookSearch />
     <v-tabs v-model="tab">
       <v-tab>全件</v-tab>
       <v-tab>今月</v-tab>
@@ -22,20 +22,18 @@
 </template>
 
 <script>
-import Search from "../Searche.vue";
+import BookSearch from "../BookSearch.vue";
 import BookListTable from "../BookListTable.vue";
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/ja";
+import axiosMixin from "@/mixins/axiosMixin";
 
-const api = new FamabonApi();
 moment.locale("ja");
 
 export default {
   components: {
     BookListTable,
-    Search
+    BookSearch
   },
   data: () => ({
     tab: null
@@ -56,36 +54,45 @@ export default {
       this.tab = 2;
     }
   },
-  mounted() {
-    // jwtをRequestヘッダーに設定する
-    api.setRequestHeader(Cookies.get("access"));
-
-    // 今月の月初と月末を取得する
-    let date_after = moment()
-      .startOf("month")
-      .format("YYYY-MM-DD");
-    let date_before = moment()
-      .endOf("month")
-      .format("YYYY-MM-DD");
-
-    api.getBookList().then(response => {
-      this.$store.dispatch("book/dispatchBookList", {
-        book_list: response["data"]
+  methods: {
+    initBook() {
+      this.callApiGetBookList();
+      this.callApiGetFilterBookList();
+    },
+    /* 帳簿全件取得するAPI呼び出し */
+    callApiGetBookList() {
+      return this.$http.get("/household/books/").then(response => {
+        this.$store.dispatch("book/dispatchBookList", {
+          book_list: response["data"]
+        });
       });
-    });
-    api
-      .getFilterBookList({
-        title: "",
-        date_after: date_after,
-        date_before: date_before,
-        tag: ""
-      })
-      .then(response => {
+    },
+    /* 今月分の帳簿取得するAPI呼び出し */
+    callApiGetFilterBookList() {
+      let date_after = moment()
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      let date_before = moment()
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      let url =
+        "/household/books/?" +
+        "date_after=" +
+        date_after +
+        "&" +
+        "date_before=" +
+        date_before;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchCurrentBookList", {
           current_book_list: response["data"]
         });
       });
-  }
+    }
+  },
+  mounted() {
+    this.initBook();
+  },
+  mixins: [axiosMixin]
 };
 </script>
 

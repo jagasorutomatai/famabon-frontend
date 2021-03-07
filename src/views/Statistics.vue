@@ -2,6 +2,7 @@
   <div>
     <v-system-bar window class="mt-5 white">
       <v-btn
+        name="dialog"
         small
         @click="openDialog()"
         class="mr-3"
@@ -24,6 +25,7 @@
             </v-col>
             <v-col v-for="item in period" :key="item.date" cols="12" sm="4">
               <v-btn
+                name="submit"
                 @click="changePeriod(item)"
                 v-text="item.date"
                 block
@@ -35,7 +37,7 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="justify-center">
-          <v-btn @click="cancel()" depressed>キャンセル</v-btn>
+          <v-btn name="cancel" @click="cancel()" depressed>キャンセル</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -89,10 +91,7 @@ import Total from "../components/statistics/Total.vue";
 import lineChartMixin from "../mixins/lineChartMixin";
 import pieChartMixin from "../mixins/pieChartMixin";
 import barChartMixin from "../mixins/barChartMixin";
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   components: {
@@ -112,13 +111,8 @@ export default {
   },
   methods: {
     initStatistics() {
-      api.setRequestHeader(Cookies.get("access"));
       this.display_date = this.$route.query.date;
-      api.getPeriod().then(response => {
-        this.$store.dispatch("statistics/dispatchPeriod", {
-          period: response.data
-        });
-      });
+      this.callApiGetPeriod();
     },
     changePeriod(item) {
       this.$router.push({
@@ -132,6 +126,14 @@ export default {
     },
     cancel() {
       this.dialog = false;
+    },
+    // 帳簿の期間を取得するAPI呼び出し
+    callApiGetPeriod() {
+      this.$http.get().then(response => {
+        this.$store.dispatch("statistics/dispatchPeriod", {
+          period: response.data
+        });
+      });
     }
   },
   watch: {
@@ -142,6 +144,6 @@ export default {
   mounted() {
     this.initStatistics();
   },
-  mixins: [lineChartMixin, pieChartMixin, barChartMixin]
+  mixins: [lineChartMixin, pieChartMixin, barChartMixin, axiosMixin]
 };
 </script>

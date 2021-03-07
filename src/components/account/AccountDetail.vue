@@ -37,10 +37,8 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
+import axiosMixin from "@/mixins/axiosMixin";
 
-const api = new FamabonApi();
 export default {
   computed: {
     account() {
@@ -48,18 +46,21 @@ export default {
     }
   },
   methods: {
+    initAccountDetail() {
+      this.$http.get("/account/auth/users/me/").then(response => {
+        this.$store.dispatch("account/dispatchAccount", {
+          account: response.data
+        });
+      });
+    },
     toAccountEditPage() {
       this.$router.push({ name: "account_edit" });
     }
   },
   mounted() {
-    api.setRequestHeader(Cookies.get("access"));
-    api.getCurrentAccount().then(response => {
-      this.$store.dispatch("account/dispatchAccount", {
-        account: response.data
-      });
-    });
-  }
+    this.initAccountDetail();
+  },
+  mixins: [axiosMixin]
 };
 </script>
 

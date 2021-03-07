@@ -1,7 +1,4 @@
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -10,30 +7,17 @@ export default {
   }),
   methods: {
     async initPieChart() {
-      api.setRequestHeader(Cookies.get("access"));
-
-      let date_after = this.$route.query.date_after;
-      let date_before = this.$route.query.date_before;
+      let body = {
+        date_after: this.$route.query.date_after,
+        date_before: this.$route.query.date_before
+      };
       if (
         typeof date_after != "undefined" &&
         typeof date_before != "undefined"
       ) {
-        await api
-          .getFilterTotalByTag({
-            date_after: this.$route.query.date_after,
-            date_before: this.$route.query.date_before
-          })
-          .then(response => {
-            this.$store.dispatch("statistics/dispatchTotalByTag", {
-              total_by_tag: response.data
-            });
-          });
+        await this.callApiGetFilterTotalByTag(body);
       } else {
-        await api.getTotalByTag().then(response => {
-          this.$store.dispatch("statistics/dispatchTotalByTag", {
-            total_by_tag: response.data
-          });
-        });
+        await this.callApiGetTotalByTag();
       }
 
       let labels = this.$store.getters["statistics/getTotalByTagLabels"];
@@ -54,6 +38,26 @@ export default {
         responsive: true,
         maintainAspectRatio: false
       };
+    },
+    // 統計データ(タグ別の合計)を取得するAPI呼び出し
+    callApiGetTotalByTag() {
+      return this.$http.get("/household/books/totalByTag/").then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByTag", {
+          total_by_tag: response.data
+        });
+      });
+    },
+    // フィルターした統計データ(タグ別の合計)を取得するAPI呼び出し
+    callApiGetFilterTotalByTag(body) {
+      let url = "/household/books/totalByTag/";
+      let date_after = "date_after=" + body.date_after;
+      let date_before = "date_before=" + body.date_before;
+      url = url + "?" + date_after + "&" + date_before;
+      return this.$http.get(url).then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByTag", {
+          total_by_tag: response.data
+        });
+      });
     }
   },
   watch: {
@@ -63,5 +67,6 @@ export default {
   },
   mounted() {
     this.initPieChart();
-  }
+  },
+  mixins: [axiosMixin]
 };

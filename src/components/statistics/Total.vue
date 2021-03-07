@@ -23,10 +23,7 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -35,47 +32,64 @@ export default {
   }),
   methods: {
     async initTotal() {
-      api.setRequestHeader(Cookies.get("access"));
-      let date_after = this.$route.query.date_after;
-      let date_before = this.$route.query.date_before;
+      let body = {
+        date_after: this.$route.query.date_after,
+        date_before: this.$route.query.date_before
+      };
       if (
-        typeof date_after != "undefined" &&
-        typeof date_before != "undefined"
+        typeof body.date_after != "undefined" &&
+        typeof body.date_before != "undefined"
       ) {
-        await api
-          .getFilterTotalByTag({
-            date_after: this.$route.query.date_after,
-            date_before: this.$route.query.date_before
-          })
-          .then(response => {
-            this.$store.dispatch("statistics/dispatchTotalByTag", {
-              total_by_tag: response.data
-            });
-          });
-        await api
-          .getFilterTotal({
-            date_after: this.$route.query.date_after,
-            date_before: this.$route.query.date_before
-          })
-          .then(response => {
-            this.$store.dispatch("statistics/dispatchTotal", {
-              total: response.data.total
-            });
-          });
+        await this.callApiGetFilterTotalByTag(body);
+        await this.callApiGetFilterTotal(body);
       } else {
-        await api.getTotalByTag().then(response => {
-          this.$store.dispatch("statistics/dispatchTotalByTag", {
-            total_by_tag: response.data
-          });
-        });
-        await api.getTotal().then(response => {
-          this.$store.dispatch("statistics/dispatchTotal", {
-            total: response.data.total
-          });
-        });
+        await this.callApiGetTotalByTag();
+        await this.callApiGetTotal();
       }
       this.total = this.$store.getters["statistics/getTotal"];
       this.total_by_tag = this.$store.getters["statistics/getTotalByTag"];
+    },
+    // 統計データ(タグ別の合計)を取得するAPI呼び出し
+    callApiGetTotalByTag() {
+      return this.$http.get("/household/books/totalByTag/").then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByTag", {
+          total_by_tag: response.data
+        });
+      });
+    },
+    // 統計データ(帳簿の合計)を取得するAPI呼び出し
+    callApiGetTotal() {
+      return this.$http.get("/household/books/total/").then(response => {
+        this.$store.dispatch("statistics/dispatchTotal", {
+          total: response.data.total
+        });
+      });
+    },
+    // フィルターした統計データ(タグ別の合計)を取得するAPI呼び出し
+    callApiGetFilterTotalByTag(body) {
+      let url = "/household/books/totalByTag/";
+      if (body != null) {
+        let date_after = "date_after=" + body.date_after;
+        let date_before = "date_before=" + body.date_before;
+        url = url + "?" + date_after + "&" + date_before;
+      }
+      return this.$http.get(url).then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByTag", {
+          total_by_tag: response.data
+        });
+      });
+    },
+    // フィルターした統計データ(帳簿の合計)を取得するAPI呼び出し
+    callApiGetFilterTotal(body) {
+      let url = "/household/books/total/";
+      let date_after = "date_after=" + body.date_after;
+      let date_before = "date_before=" + body.date_before;
+      url = url + "?" + date_after + "&" + date_before;
+      return this.$http.get(url).then(response => {
+        this.$store.dispatch("statistics/dispatchTotal", {
+          total: response.data.total
+        });
+      });
     }
   },
   watch: {
@@ -85,8 +99,7 @@ export default {
   },
   mounted() {
     this.initTotal();
-  }
+  },
+  mixins: [axiosMixin]
 };
 </script>
-
-<style></style>

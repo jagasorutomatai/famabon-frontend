@@ -8,7 +8,7 @@
       famabon
     </v-toolbar-title>
     <v-spacer />
-    <v-chip class="ma-2" dark label>
+    <v-chip v-if="account_username" class="ma-2" dark label>
       <v-icon left>
         mdi-account-circle-outline
       </v-icon>

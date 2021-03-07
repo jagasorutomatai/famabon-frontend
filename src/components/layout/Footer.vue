@@ -2,7 +2,7 @@
   <v-footer app dark padless>
     <v-card class="flex" flat tile>
       <v-card-text class="py-2 white--text text-center">
-        &copy; 2020
+        <span>&copy; 2021 famabon-frontend</span>
       </v-card-text>
     </v-card>
   </v-footer>

@@ -5,12 +5,14 @@
     </v-col>
     <v-col cols="10" sm="4">
       <v-text-field
+        name="title"
         v-model="form.title"
         dense
         label="項目名"
         outlined
       ></v-text-field>
       <v-select
+        name="tag"
         v-model="form.tag"
         dense
         :items="tag_list"
@@ -30,6 +32,7 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
+            name="date_after"
             label="検索開始年月"
             dense
             outlined
@@ -65,6 +68,7 @@
       >
         <template v-slot:activator="{ on, attrs }">
           <v-text-field
+            name="date_before"
             label="検索終了年月"
             dense
             outlined
@@ -91,12 +95,24 @@
       </v-menu>
     </v-col>
     <v-col class="text-right" cols="10" sm="4">
-      <v-btn @click="search()" class="mr-1" color="info" width="95px">
+      <v-btn
+        name="submit"
+        @click="callApiGetFilterBook()"
+        class="mr-1"
+        color="info"
+        width="95px"
+      >
         検索
       </v-btn>
     </v-col>
     <v-col class="text-left" cols="10" sm="5">
-      <v-btn @click="reset()" class="ml-1" color="secondary" width="95px">
+      <v-btn
+        name="reset"
+        @click="reset()"
+        class="ml-1"
+        color="secondary"
+        width="95px"
+      >
         リセット
       </v-btn>
     </v-col>
@@ -104,10 +120,7 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -122,34 +135,56 @@ export default {
   }),
   computed: {
     tag_list() {
-      return this.$store.getters["tag/getTagListForSelector"];
+      let tag_list = [];
+      for (let tag of this.$store.getters["tag/getTagList"]) {
+        tag_list.push(tag.name);
+      }
+      return tag_list;
     }
   },
   methods: {
-    search() {
-      api.getFilterBookList(this.form).then(response => {
+    initBookSearch() {
+      this.callApiGetTagList();
+    },
+    reset() {
+      this.$store.commit("book/changeSearchedBookList", {
+        book_list_searched: []
+      });
+      this.form = { title: "", tag: "", date_before: "", date_after: "" };
+    },
+    // タグ全件取得するAPI呼び出し
+    callApiGetTagList() {
+      return this.$http.get("/household/tags/").then(response => {
+        this.$store.dispatch("tag/dispatchTagList", {
+          tag_list: response["data"]
+        });
+      });
+    },
+    // 帳簿をフィルターして取得するAPI呼び出し
+    callApiGetFilterBook() {
+      let title = "title=" + this.form.title;
+      let date_after = "date_after=" + this.form.date_after;
+      let date_before = "date_before=" + this.form.date_before;
+      let tag = "tag=" + this.form.tag;
+      let url =
+        "/household/books/?" +
+        title +
+        "&" +
+        date_after +
+        "&" +
+        date_before +
+        "&" +
+        tag;
+      this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchSearchedBookList", {
           searched_book_list: response["data"]
         });
       });
-    },
-    reset() {
-      this.$store.commit("book/changeBookListSearched", {
-        book_list_searched: []
-      });
-      this.form = { title: "", tag: "", date_before: "", date_after: "" };
     }
   },
   mounted() {
-    // jwtをRequestヘッダーに設定する
-    api.setRequestHeader(Cookies.get("access"));
-    api.getTagList().then(response => {
-      this.$store.dispatch("tag/dispatchTagList", {
-        tag_list: response["data"]
-      });
-    });
-  }
+    this.initBookSearch();
+  },
+  mixins: [axiosMixin]
 };
 </script>
-
-<style></style>

@@ -13,19 +13,6 @@ const getters = {
       tag_list.push(tag.name);
     }
     return tag_list;
-  },
-
-  getTagListForStatistics: state => {
-    let tag_list = [];
-    for (let tag of state.tag_list) {
-      tag_list.push({
-        uuid: tag.uuid,
-        name: tag.name,
-        color: tag.color,
-        total: 4300
-      });
-    }
-    return tag_list;
   }
 };
 

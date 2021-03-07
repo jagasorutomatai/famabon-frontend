@@ -1,7 +1,4 @@
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -10,29 +7,17 @@ export default {
   }),
   methods: {
     async initLineChart() {
-      api.setRequestHeader(Cookies.get("access"));
-      let date_after = this.$route.query.date_after;
-      let date_before = this.$route.query.date_before;
+      let body = {
+        date_after: this.$route.query.date_after,
+        date_before: this.$route.query.date_before
+      };
       if (
         typeof date_after != "undefined" &&
         typeof date_before != "undefined"
       ) {
-        await api
-          .getFilterTotalByDate({
-            date_after: this.$route.query.date_after,
-            date_before: this.$route.query.date_before
-          })
-          .then(response => {
-            this.$store.dispatch("statistics/dispatchTotalByDate", {
-              total_by_date: response.data
-            });
-          });
+        await this.callApiGetFilterTotalByDate(body);
       } else {
-        await api.getTotalByDate().then(response => {
-          this.$store.dispatch("statistics/dispatchTotalByDate", {
-            total_by_date: response.data
-          });
-        });
+        await this.callApiGetTotalByDate();
       }
       let labels = this.$store.getters["statistics/getTotalByDateLabels"];
       let data = this.$store.getters["statistics/getTotalByDateData"];
@@ -63,6 +48,26 @@ export default {
         responsive: true,
         maintainAspectRatio: false
       };
+    },
+    // 統計データ(日別の合計)を取得するAPI呼び出し
+    callApiGetTotalByDate() {
+      this.$http.get("/household/books/totalByDate/").then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByDate", {
+          total_by_date: response.data
+        });
+      });
+    },
+    // フィルターした統計データ(日別の合計)を取得するAPI呼び出し
+    callApiGetFilterTotalByDate(body) {
+      let url = "/household/books/totalByDate/";
+      let date_after = "date_after=" + body.date_after;
+      let date_before = "date_before=" + body.date_before;
+      url = url + "?" + date_after + "&" + date_before;
+      this.$http.get(url).then(response => {
+        this.$store.dispatch("statistics/dispatchTotalByDate", {
+          total_by_date: response.data
+        });
+      });
     }
   },
   watch: {
@@ -72,5 +77,6 @@ export default {
   },
   mounted() {
     this.initLineChart();
-  }
+  },
+  mixins: [axiosMixin]
 };

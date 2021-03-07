@@ -51,13 +51,20 @@
           </v-card-text>
           <v-card-actions class="pa-3">
             <v-btn
+              name="edit"
               @click="toEditBookPage()"
               class="mr-1"
               color="primary"
               depressed
               >編集</v-btn
             >
-            <v-btn color="red" dark depressed @click="delete_dialog = true">
+            <v-btn
+              name="delete"
+              color="red"
+              dark
+              depressed
+              @click="delete_dialog = true"
+            >
               削除
             </v-btn>
           </v-card-actions>
@@ -73,8 +80,15 @@
           </ul>
         </v-card-text>
         <v-card-actions>
-          <v-btn @click="deleteBook()" color="primary" depressed>OK</v-btn>
-          <v-btn depressed @click="cancel()">キャンセル</v-btn>
+          <v-btn
+            name="submit"
+            @click="callApiDeleteBook()"
+            color="primary"
+            depressed
+          >
+            OK
+          </v-btn>
+          <v-btn name="cancel" depressed @click="cancel()">キャンセル</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -82,10 +96,7 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
-import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -102,28 +113,33 @@ export default {
   }),
   methods: {
     initBookDetail() {
+      this.callApiGetBookDetail();
+    },
+    toEditBookPage() {
       let uuid = this.$route.params["uuid"];
-      api.getBookDetail({ uuid: uuid }).then(response => {
+      this.$router.push({ name: "book_edit", params: { uuid: uuid } });
+    },
+    cancel() {
+      this.delete_dialog = false;
+    },
+    // 帳簿の詳細を取得するAPI呼び出し
+    callApiGetBookDetail() {
+      let url = "/household/books/" + this.$route.params["uuid"] + "/";
+      this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchBookDetail", {
           book_detail: response["data"]
         });
         this.book_detail = this.$store.getters["book/getBookDetail"];
       });
     },
-    toEditBookPage() {
-      let uuid = this.$route.params["uuid"];
-      this.$router.push({ name: "book_edit", params: { uuid: uuid } });
-    },
-    deleteBook() {
-      let uuid = this.$route.params["uuid"];
-      api.deleteBook({ uuid: uuid }).then(response => {
+    // 帳簿を削除するAPI呼び出し
+    callApiDeleteBook() {
+      let url = "/household/books/" + this.$route.params["uuid"] + "/";
+      this.$http.delete(url).then(response => {
         if (response.status == "204") {
           this.$router.push({ name: "book" });
         }
       });
-    },
-    cancel() {
-      this.delete_dialog = false;
     }
   },
   watch: {
@@ -132,9 +148,9 @@ export default {
     }
   },
   mounted() {
-    api.setRequestHeader(Cookies.get("access"));
     this.initBookDetail();
-  }
+  },
+  mixins: [axiosMixin]
 };
 </script>
 
