@@ -6,6 +6,7 @@
           <v-card-title>パスワード変更</v-card-title>
           <v-card-actions>
             <v-text-field
+              name="new_password"
               :append-icon="is_show_password ? 'mdi-eye' : 'mdi-eye-off'"
               dense
               label="新しいパスワード"
@@ -19,6 +20,7 @@
           </v-card-actions>
           <v-card-actions>
             <v-text-field
+              name="re_new_password"
               :append-icon="is_show_password ? 'mdi-eye' : 'mdi-eye-off'"
               dense
               label="新しいパスワード(確認用)"
@@ -32,6 +34,7 @@
           </v-card-actions>
           <v-card-actions>
             <v-text-field
+              name="current_password"
               :append-icon="is_show_password ? 'mdi-eye' : 'mdi-eye-off'"
               dense
               label="現在のパスワード"
@@ -45,6 +48,7 @@
           </v-card-actions>
           <v-card-actions>
             <v-btn
+              name="submit"
               @click="update()"
               class="mr-1"
               color="info"
@@ -71,10 +75,8 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
+import axiosMixin from "@/mixins/axiosMixin";
 import Cookies from "js-cookie";
-
-const api = new FamabonApi();
 
 export default {
   data: () => ({
@@ -88,10 +90,9 @@ export default {
   }),
   methods: {
     update() {
-      api
-        .changePassword(this.form)
+      this.$http
+        .post("/account/auth/users/set_password/", this.form)
         .then(response => {
-          console.log(response);
           if (response.status == "204") {
             this.error_messages = {};
             this.form = {
@@ -111,9 +112,7 @@ export default {
     },
     cancel() {}
   },
-  mounted() {
-    api.setRequestHeader(Cookies.get("access"));
-  }
+  mixins: [axiosMixin]
 };
 </script>
 

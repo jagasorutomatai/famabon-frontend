@@ -5,12 +5,17 @@
         タグの設定<br /><v-divider />
       </v-col>
       <v-col cols="9" sm="9">
-        <v-btn color="primary" depressed @click="openEditTagDialog('POST')">
+        <v-btn
+          name="create"
+          color="primary"
+          depressed
+          @click="openEditTagDialog('POST')"
+        >
           タグの追加
         </v-btn>
       </v-col>
       <v-col cols="9" sm="9">
-        <v-data-table :headers="headers" :items="tagList" hide-default-footer>
+        <v-data-table :headers="headers" :items="tag_list" hide-default-footer>
           <template v-slot:[`item.color`]="{ item }">
             <v-chip :color="item.color" text-color="white" small>
               <v-avatar left>
@@ -20,10 +25,15 @@
             </v-chip>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
-            <v-icon small class="mr-2" @click="openEditTagDialog('PUT', item)">
+            <v-icon
+              name="edit"
+              small
+              class="mr-2"
+              @click="openEditTagDialog('PUT', item)"
+            >
               mdi-pencil
             </v-icon>
-            <v-icon small @click="openDeleteTagDialog(item)">
+            <v-icon name="delete" small @click="openDeleteTagDialog(item)">
               mdi-delete
             </v-icon>
           </template>
@@ -45,6 +55,7 @@
               タブの新規作成と既存のタブの編集ができます
             </v-card-subtitle>
             <v-text-field
+              name="name"
               v-model="form.name"
               class="px-6"
               dense
@@ -54,6 +65,7 @@
               :error-messages="this.error_messages['name']"
             ></v-text-field>
             <v-select
+              name="color"
               v-model="form.color"
               class="px-6"
               dense
@@ -71,22 +83,26 @@
             </v-card-text>
             <v-card-actions>
               <v-btn
+                name="submit_post"
                 v-if="method == 'POST'"
-                @click="createTag()"
+                @click="callApiPostTag()"
                 color="primary"
                 depressed
               >
                 OK
               </v-btn>
               <v-btn
+                name="submit_put"
                 v-if="method == 'PUT'"
-                @click="updateTag()"
+                @click="callApiPutTag()"
                 color="primary"
                 depressed
               >
                 OK
               </v-btn>
-              <v-btn depressed @click="cancel()">キャンセル</v-btn>
+              <v-btn name="cancel" depressed @click="cancel()">
+                キャンセル
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -103,8 +119,17 @@
               <strong class="red--text">{{ form.name }}</strong>
             </v-card-text>
             <v-card-actions>
-              <v-btn @click="deleteTag()" color="primary" depressed>OK</v-btn>
-              <v-btn depressed @click="cancel()">キャンセル</v-btn>
+              <v-btn
+                name="submit_delete"
+                @click="callApiDeleteTag()"
+                color="primary"
+                depressed
+              >
+                OK
+              </v-btn>
+              <v-btn name="cancel_delete" depressed @click="cancel()">
+                キャンセル
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -114,10 +139,8 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
 import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 const color_list = [
   "grey",
@@ -150,12 +173,8 @@ export default {
     error_messages: {}
   }),
   methods: {
-    initSetting() {
-      api.getTagList().then(response => {
-        this.$store.dispatch("tag/dispatchTagList", {
-          tag_list: response["data"]
-        });
-      });
+    initBookSetting() {
+      this.callApiGetTagList();
     },
     openEditTagDialog(method, item = this.form) {
       this.method = method;
@@ -175,44 +194,6 @@ export default {
       this.error_messages = {};
       this.resetForm();
     },
-    createTag() {
-      api
-        .createTag(this.form)
-        .then(response => {
-          if (response.status == "201") {
-            this.initSetting();
-            this.resetForm();
-            this.error_messages = {};
-            this.dialog_edit = false;
-          }
-        })
-        .catch(error => {
-          this.error_messages = error.response.data;
-        });
-    },
-    updateTag() {
-      api
-        .updateTag(this.form)
-        .then(response => {
-          if (response.status == "200") {
-            this.initSetting();
-            this.resetForm();
-            this.error_messages = {};
-            this.dialog_edit = false;
-          }
-        })
-        .catch(error => {
-          this.error_messages = error.response.data;
-        });
-    },
-    deleteTag() {
-      api.deleteTag(this.form).then(response => {
-        if (response.status == "204") {
-          this.initSetting();
-          this.dialog_delete = false;
-        }
-      });
-    },
     resetForm() {
       this.form = {
         uuid: "",
@@ -220,18 +201,67 @@ export default {
         color: "grey",
         account_uuid: Cookies.get("account_uuid")
       };
+    },
+    // タグ全件取得するAPI呼び出し
+    callApiGetTagList() {
+      return this.$http.get("/household/tags/").then(response => {
+        this.$store.dispatch("tag/dispatchTagList", {
+          tag_list: response["data"]
+        });
+      });
+    },
+    // タグ作成するAPI呼び出し
+    callApiPostTag() {
+      return this.$http
+        .post("/household/tags/", this.form)
+        .then(response => {
+          if (response.status == "201") {
+            this.callApiGetTagList();
+            this.resetForm();
+            this.error_messages = {};
+            this.dialog_edit = false;
+          }
+        })
+        .catch(error => {
+          this.error_messages = error.response.data;
+        });
+    },
+    // タグを更新するAPI呼び出し
+    callApiPutTag() {
+      let url = "/household/tags/" + this.form.uuid + "/";
+      return this.$http
+        .put(url, this.form)
+        .then(response => {
+          if (response.status == "200") {
+            this.callApiGetTagList();
+            this.resetForm();
+            this.error_messages = {};
+            this.dialog_edit = false;
+          }
+        })
+        .catch(error => {
+          this.error_messages = error.response.data;
+        });
+    },
+    // タグを削除するAPI呼び出し
+    callApiDeleteTag() {
+      let url = "/household/tags/" + this.form.uuid + "/";
+      return this.$http.delete(url).then(response => {
+        if (response.status == "204") {
+          this.callApiGetTagList();
+          this.dialog_delete = false;
+        }
+      });
     }
   },
   computed: {
-    tagList() {
+    tag_list() {
       return this.$store.getters["tag/getTagList"];
     }
   },
   mounted() {
-    api.setRequestHeader(Cookies.get("access"));
-    this.initSetting();
-  }
+    this.initBookSetting();
+  },
+  mixins: [axiosMixin]
 };
 </script>
-
-<style></style>

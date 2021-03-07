@@ -7,6 +7,7 @@
             <v-card-title>帳簿作成</v-card-title>
             <v-card-actions>
               <v-text-field
+                name="title"
                 v-model="form.title"
                 label="タイトル"
                 placeholder="Placeholder"
@@ -18,6 +19,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-textarea
+                name="description"
                 v-model="form.description"
                 outlined
                 label="説明"
@@ -27,6 +29,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-text-field
+                name="money"
                 v-model="form.money"
                 label="金額"
                 placeholder="Placeholder"
@@ -48,6 +51,7 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
+                    name="date"
                     label="日付"
                     dense
                     outlined
@@ -75,6 +79,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-select
+                name="tag"
                 v-model="form.tag_uuid"
                 dense
                 :items="tag_list"
@@ -88,7 +93,8 @@
             </v-card-actions>
             <v-card-actions>
               <v-btn
-                @click="create()"
+                name="submit"
+                @click="callApiPostBook()"
                 class="mr-1"
                 color="info"
                 width="95px"
@@ -114,10 +120,8 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
 import Cookies from "js-cookie";
-
-const api = new FamabonApi();
+import axiosMixin from "@/mixins/axiosMixin";
 
 export default {
   data: () => ({
@@ -133,19 +137,11 @@ export default {
     error_messages: {}
   }),
   methods: {
-    create() {
-      api
-        .createBook(this.form)
-        .then(response => {
-          if (response.status == "201") {
-            this.error_messages = {};
-            this.$router.push({ name: "book" });
-          }
-        })
-        .catch(error => {
-          this.error_messages = error.response.data;
-        });
+    // 初期化処理
+    initBookCreate() {
+      this.callApiGetTagList();
     },
+    // 帳簿作成キャンセル処理
     cancel() {
       this.error_messages = {};
       this.form = {
@@ -156,6 +152,28 @@ export default {
         date: new Date().toISOString().substr(0, 10)
       };
       this.$router.go(-1);
+    },
+    // タグ全件取得するAPI呼び出し
+    callApiGetTagList() {
+      return this.$http.get("/household/tags/").then(response => {
+        this.$store.dispatch("tag/dispatchTagList", {
+          tag_list: response["data"]
+        });
+      });
+    },
+    // 帳簿を作成するAPI呼び出し
+    callApiPostBook() {
+      return this.$http
+        .post("/household/books/", this.form)
+        .then(response => {
+          if (response.status == "201") {
+            this.error_messages = {};
+            this.$router.push({ name: "book" });
+          }
+        })
+        .catch(error => {
+          this.error_messages = error.response.data;
+        });
     }
   },
   computed: {
@@ -164,15 +182,9 @@ export default {
     }
   },
   mounted() {
-    // jwtをRequestヘッダーに設定する
-    api.setRequestHeader(Cookies.get("access"));
-
-    api.getTagList().then(response => {
-      this.$store.dispatch("tag/dispatchTagList", {
-        tag_list: response["data"]
-      });
-    });
-  }
+    this.initBookCreate();
+  },
+  mixins: [axiosMixin]
 };
 </script>
 

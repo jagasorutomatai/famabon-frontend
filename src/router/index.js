@@ -10,7 +10,7 @@ import Book from "../components/household/pages/Book.vue";
 import BookCreate from "../components/household/pages/BookCreate.vue";
 import BookDetail from "../components/household/pages/BookDetail.vue";
 import BookEdit from "../components/household/pages/BookEdit.vue";
-import Setting from "../components/household/pages/Setting.vue";
+import BookSetting from "../components/household/pages/BookSetting.vue";
 import Account from "../views/Account.vue";
 import Home from "../views/Home.vue";
 import Household from "../views/Household.vue";
@@ -99,7 +99,7 @@ const routes = [
       {
         path: "setting",
         name: "setting",
-        component: Setting,
+        component: BookSetting,
         meta: { requiresAuth: true }
       }
     ]

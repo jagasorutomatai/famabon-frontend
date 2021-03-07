@@ -7,12 +7,14 @@
           <v-card class="pa-4 text-center" outlined>
             <v-card-text class="mb-3"><h3>ログイン</h3></v-card-text>
             <v-text-field
+              name="username"
               dense
               label="ユーザー名"
               outlined
               v-model="form.username"
             ></v-text-field>
             <v-text-field
+              name="password"
               :append-icon="is_show_password ? 'mdi-eye' : 'mdi-eye-off'"
               dense
               label="パスワード"
@@ -21,12 +23,19 @@
               @click:append="is_show_password = !is_show_password"
               v-model="form.password"
             ></v-text-field>
-            <v-btn block class="mb-2" color="info" @click="login()" depressed>
+            <v-btn
+              name="submit"
+              block
+              class="mb-2"
+              color="info"
+              @click="login()"
+              depressed
+            >
               ログイン
             </v-btn>
             <v-divider class="my-4" />
             <p>アカウントをお持ちでない方</p>
-            <v-btn @click="toAccountCreatePage()" block depressed>
+            <v-btn name="create" @click="toAccountCreatePage()" block depressed>
               アカウント新規作成
             </v-btn>
           </v-card>
@@ -37,10 +46,9 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
+import axiosMixin from "@/mixins/axiosMixin";
 import Cookies from "js-cookie";
 
-const api = new FamabonApi();
 const error_message = "ユーザー名またはパスワードを確認できません";
 
 export default {
@@ -54,18 +62,22 @@ export default {
     }
   }),
   methods: {
-    async login() {
-      api
-        .createJWT(this.form)
+    login() {
+      this.callApiCreateJWT();
+    },
+    toAccountCreatePage() {
+      this.$router.push({ name: "account_create" });
+    },
+    // JWTを発行するAPI呼び出し
+    callApiCreateJWT() {
+      let url = "/account/auth/jwt/create/";
+      return this.$http
+        .post(url, this.form)
         .then(response => {
           if (response.status == "200") {
             Cookies.set("access", response["data"]["access"]);
             Cookies.set("refresh", response["data"]["refresh"]);
-            api.setRequestHeader(Cookies.get("access"));
-            api.getCurrentAccount().then(response => {
-              Cookies.set("account_username", response["data"]["username"]);
-              Cookies.set("account_uuid", response["data"]["uuid"]);
-            });
+            this.callApiGetAccountDetail();
             this.$store.dispatch("auth/login");
             this.is_error = false;
             this.$router.push({ path: "/" });
@@ -77,11 +89,14 @@ export default {
           }
         });
     },
-    toAccountCreatePage() {
-      this.$router.push({ name: "account_create" });
+    // ログインしているアカウントを取得するAPI呼び出し
+    callApiGetAccountDetail() {
+      return this.$http.get("/account/auth/users/me/").then(response => {
+        Cookies.set("account_username", response["data"]["username"]);
+        Cookies.set("account_uuid", response["data"]["uuid"]);
+      });
     }
-  }
+  },
+  mixins: [axiosMixin]
 };
 </script>
-
-<style></style>

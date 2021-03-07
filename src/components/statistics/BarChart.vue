@@ -7,8 +7,13 @@ export default {
   name: "Barchart",
   mixins: [reactiveProp],
   props: ["options"],
+  methods: {
+    initBarChart() {
+      this.renderChart(this.data, this.options);
+    }
+  },
   mounted() {
-    this.renderChart(this.data, this.options);
+    this.initBarChart();
   }
 };
 </script>

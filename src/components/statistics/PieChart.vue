@@ -7,8 +7,13 @@ export default {
   name: "PieChart",
   mixins: [reactiveProp],
   props: ["options"],
+  methods: {
+    initPieChart() {
+      this.renderChart(this.datas, this.options);
+    }
+  },
   mounted() {
-    this.renderChart(this.datas, this.options);
+    this.initPieChart();
   }
 };
 </script>

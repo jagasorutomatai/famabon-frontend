@@ -7,6 +7,7 @@
             <v-card-title>帳簿編集</v-card-title>
             <v-card-actions>
               <v-text-field
+                name="title"
                 v-model="form.title"
                 label="タイトル"
                 placeholder="Placeholder"
@@ -18,6 +19,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-textarea
+                name="description"
                 v-model="form.description"
                 outlined
                 label="説明"
@@ -27,6 +29,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-text-field
+                name="money"
                 v-model="form.money"
                 label="金額"
                 placeholder="Placeholder"
@@ -48,6 +51,7 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
+                    name="date"
                     label="日付"
                     dense
                     outlined
@@ -75,6 +79,7 @@
             </v-card-actions>
             <v-card-actions>
               <v-select
+                name="tag"
                 v-model="form.tag_uuid"
                 dense
                 :items="tag_list"
@@ -88,7 +93,8 @@
             </v-card-actions>
             <v-card-actions>
               <v-btn
-                @click="update()"
+                name="submit"
+                @click="callApiPutBook()"
                 class="mr-1"
                 color="info"
                 width="95px"
@@ -114,10 +120,7 @@
 </template>
 
 <script>
-import { FamabonApi } from "@/api/api.js";
 import Cookies from "js-cookie";
-
-const api = new FamabonApi();
 
 export default {
   data: () => ({
@@ -133,19 +136,16 @@ export default {
     },
     error_messages: {}
   }),
+  computed: {
+    tag_list() {
+      return this.$store.getters["tag/getTagList"];
+    }
+  },
   methods: {
+    // 初期化処理
     async initBookEdit() {
-      api.setRequestHeader(Cookies.get("access"));
-
-      // 更新用の帳簿データを取得
-      let uuid = this.$route.params["uuid"];
-      await api.getBookDetail({ uuid: uuid }).then(response => {
-        this.$store.dispatch("book/dispatchBookDetail", {
-          book_detail: response["data"]
-        });
-        this.book_detail = this.$store.getters["book/getBookDetail"];
-      });
-
+      await this.callApiGetBookDetail();
+      await this.callApiGetTagList();
       let book_detail = this.$store.getters["book/getBookDetail"];
       this.form = {
         uuid: book_detail.uuid,
@@ -156,18 +156,37 @@ export default {
         account_uuid: book_detail.account,
         date: book_detail.date
       };
-
-      // セレクタ用のタグデータを取得
-      api.getTagList().then(response => {
+    },
+    // 帳簿編集キャンセル処理
+    cancel() {
+      this.error_messages = {};
+      let uuid = this.$route.params["uuid"];
+      this.$router.push({ name: "book_detail", params: { uuid: uuid } });
+    },
+    // 帳簿詳細を取得するAPI呼び出し
+    callApiGetBookDetail() {
+      let uuid = this.$route.params["uuid"];
+      let url = "/household/books/" + uuid + "/";
+      return this.$http.get(url).then(response => {
+        this.$store.dispatch("book/dispatchBookDetail", {
+          book_detail: response["data"]
+        });
+        this.book_detail = this.$store.getters["book/getBookDetail"];
+      });
+    },
+    // タグ全件取得するAPI呼び出し
+    callApiGetTagList() {
+      return this.$http.get("/household/tags/").then(response => {
         this.$store.dispatch("tag/dispatchTagList", {
           tag_list: response["data"]
         });
       });
     },
-    update() {
-      console.log(this.form);
-      api
-        .updateBook(this.form)
+    // 帳簿を更新するAPI呼び出し
+    callApiPutBook() {
+      let url = "/household/books/" + this.form.uuid + "/";
+      this.$http
+        .put(url, this.form)
         .then(response => {
           if (response.status == "200") {
             this.error_messages = {};
@@ -177,16 +196,6 @@ export default {
         .catch(error => {
           this.error_messages = error.response.data;
         });
-    },
-    cancel() {
-      this.error_messages = {};
-      let uuid = this.$route.params["uuid"];
-      this.$router.push({ name: "book_detail", params: { uuid: uuid } });
-    }
-  },
-  computed: {
-    tag_list() {
-      return this.$store.getters["tag/getTagList"];
     }
   },
   mounted() {
