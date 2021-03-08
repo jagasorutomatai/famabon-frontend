@@ -20,6 +20,9 @@
         {{ item.tag.name }}
       </v-chip>
     </template>
+    <template v-slot:no-data>
+      帳簿の情報が存在しないです
+    </template>
   </v-data-table>
 </template>
 
