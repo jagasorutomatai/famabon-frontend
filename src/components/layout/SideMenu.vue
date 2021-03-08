@@ -49,11 +49,7 @@
         link
         :to="{
           name: 'statistics',
-          query: {
-            date: '2021年2月',
-            date_after: '2021-02-01',
-            date_before: '2021-02-28'
-          }
+          query: now()
         }"
       >
         <v-list-item-icon>
@@ -88,12 +84,32 @@
 
 <script>
 import Cookies from "js-cookie";
+import moment from "moment";
+import "moment/locale/ja";
+
+moment.locale("ja");
 export default {
   data: () => ({
     active: true,
     selectedItem: 0,
     right: null
   }),
+  methods: {
+    now() {
+      let date_after = moment()
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      let date_before = moment()
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      let date = moment().format("YYYY年MM月");
+      return {
+        date: date,
+        date_after: date_after,
+        date_before: date_before
+      };
+    }
+  },
   computed: {
     uuid() {
       return Cookies.get("account_uuid");

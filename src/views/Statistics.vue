@@ -129,7 +129,7 @@ export default {
     },
     // 帳簿の期間を取得するAPI呼び出し
     callApiGetPeriod() {
-      this.$http.get().then(response => {
+      this.$http.get("/household/books/period/").then(response => {
         this.$store.dispatch("statistics/dispatchPeriod", {
           period: response.data
         });
