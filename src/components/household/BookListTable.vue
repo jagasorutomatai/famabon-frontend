@@ -1,29 +1,31 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="book_list"
-    :items-per-page="10"
-    class="elevation-1"
-    @click:row="openBookDetail"
-  >
-    <template v-slot:[`item.tag`]="{ item }">
-      <v-chip
-        v-if="item.tag"
-        class="ma-2"
-        :color="item.tag.color"
-        text-color="white"
-        small
-      >
-        <v-avatar left>
-          <v-icon small>mdi-tag</v-icon>
-        </v-avatar>
-        {{ item.tag.name }}
-      </v-chip>
-    </template>
-    <template v-slot:no-data>
-      帳簿の情報が存在しないです
-    </template>
-  </v-data-table>
+  <v-card outlined>
+    <v-data-table
+      :headers="headers"
+      :items="book_list"
+      :items-per-page="10"
+      class="elevation-0"
+      @click:row="openBookDetail"
+    >
+      <template v-slot:[`item.tag`]="{ item }">
+        <v-chip
+          v-if="item.tag"
+          class="ma-2"
+          :color="item.tag.color"
+          text-color="white"
+          small
+        >
+          <v-avatar left>
+            <v-icon small>mdi-tag</v-icon>
+          </v-avatar>
+          {{ item.tag.name }}
+        </v-chip>
+      </template>
+      <template v-slot:no-data>
+        帳簿の情報が存在しないです
+      </template>
+    </v-data-table>
+  </v-card>
 </template>
 
 <script>

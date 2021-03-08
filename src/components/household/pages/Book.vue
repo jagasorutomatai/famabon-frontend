@@ -6,7 +6,6 @@
       <v-tab>今月</v-tab>
       <v-tab>検索結果</v-tab>
     </v-tabs>
-    <v-divider></v-divider>
     <v-tabs-items v-model="tab">
       <v-tab-item>
         <BookListTable :book_list="bookList" />

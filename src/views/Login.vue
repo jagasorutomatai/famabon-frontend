@@ -68,7 +68,7 @@ export default {
         await this.callApiGetAccountDetail();
         this.$store.dispatch("auth/login");
         this.is_error = false;
-        this.$router.push({ path: "/" });
+        this.$router.push({ name: "/" });
       }
     },
     toAccountCreatePage() {

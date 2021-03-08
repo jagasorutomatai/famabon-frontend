@@ -24,6 +24,14 @@
     </v-list-item>
     <v-divider></v-divider>
     <v-list nav dense>
+      <v-list-item link dense :to="{ name: 'Home' }">
+        <v-list-item-icon>
+          <v-icon>mdi-home</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>ホーム</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
       <v-list-group v-model="active" prepend-icon="mdi-book-open" no-action>
         <template v-slot:activator>
           <v-list-item-content>
