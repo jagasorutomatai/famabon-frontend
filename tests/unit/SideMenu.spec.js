@@ -1,30 +1,33 @@
 import SideMenu from "@/components/layout/SideMenu.vue";
-import router_index from "@/router/index.js";
 import { createLocalVue, shallowMount } from "@vue/test-utils";
+import flushPromises from "flush-promises";
 import Cookies from "js-cookie";
 import moment from "moment";
 import "moment/locale/ja";
-import VueRouter from "vue-router";
 import Vuetify from "vuetify";
 
 moment.locale("ja");
 
 const localVue = createLocalVue();
-localVue.use(VueRouter);
 
 describe("SideMenu.test.js", () => {
+  // this.$router.pushのモック
+  let mockRouterPush = jest.fn();
   let wrapper;
   let router;
   let vuetify;
   beforeEach(() => {
     vuetify = new Vuetify();
-    let options = router_index.options;
-    router = new VueRouter({ options });
     wrapper = shallowMount(SideMenu, {
       router,
       vuetify,
       Cookies,
-      localVue
+      localVue,
+      mocks: {
+        $router: {
+          push: mockRouterPush
+        }
+      }
     });
     Cookies.set("account_uuid", "aaa-bbb-ccc-ddd");
   });
@@ -64,6 +67,21 @@ describe("SideMenu.test.js", () => {
     });
     expect(account_detail_link.props().to.params).toEqual({
       uuid: "aaa-bbb-ccc-ddd"
+    });
+  });
+  it("ログアウト処理の確認", async () => {
+    // methodsプロパティを実行
+    wrapper.vm.logout();
+    await flushPromises();
+
+    // 評価
+    expect(Cookies.get("access")).toBe(undefined);
+    expect(Cookies.get("refresh")).toBe(undefined);
+    expect(Cookies.get("account_username")).toBe(undefined);
+    expect(Cookies.get("account_uuid")).toBe(undefined);
+    expect(mockRouterPush).toHaveBeenCalled();
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      name: "login"
     });
   });
 });
