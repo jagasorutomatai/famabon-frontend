@@ -2,8 +2,12 @@ import SideMenu from "@/components/layout/SideMenu.vue";
 import router_index from "@/router/index.js";
 import { createLocalVue, shallowMount } from "@vue/test-utils";
 import Cookies from "js-cookie";
+import moment from "moment";
+import "moment/locale/ja";
 import VueRouter from "vue-router";
 import Vuetify from "vuetify";
+
+moment.locale("ja");
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
@@ -46,10 +50,17 @@ describe("SideMenu.test.js", () => {
     let account_detail_link = wrapper.findAll("v-list-item-stub").at(4); // アカウント詳細ページへのリンク
 
     // 評価
+    let date_after = moment()
+      .startOf("month")
+      .format("YYYY-MM-DD");
+    let date_before = moment()
+      .endOf("month")
+      .format("YYYY-MM-DD");
+    let date = moment().format("YYYY年MM月");
     expect(statistics_link.props().to.query).toEqual({
-      date: "2021年2月",
-      date_after: "2021-02-01",
-      date_before: "2021-02-28"
+      date: date,
+      date_after: date_after,
+      date_before: date_before
     });
     expect(account_detail_link.props().to.params).toEqual({
       uuid: "aaa-bbb-ccc-ddd"
