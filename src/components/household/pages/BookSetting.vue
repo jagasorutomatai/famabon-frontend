@@ -38,9 +38,7 @@
             </v-icon>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary">
-              Reset
-            </v-btn>
+            タグが存在しないです
           </template>
         </v-data-table>
         <!-- 作成+編集用のダイアログボックス -->
