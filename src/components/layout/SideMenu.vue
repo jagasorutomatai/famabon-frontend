@@ -77,6 +77,14 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="logout()" link dense>
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon class="mr-3" left small>mdi-logout</v-icon>
+              ログアウト
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list-group>
     </v-list>
   </v-navigation-drawer>
@@ -108,6 +116,17 @@ export default {
         date_after: date_after,
         date_before: date_before
       };
+    },
+    logout() {
+      Cookies.remove("access");
+      Cookies.remove("refresh");
+      Cookies.remove("account_username");
+      Cookies.remove("account_uuid");
+      this.$store.dispatch("auth/reset");
+      this.$store.dispatch("book/reset");
+      this.$store.dispatch("account/reset");
+      this.$store.dispatch("tag/reset");
+      this.$router.push({ name: "login" });
     }
   },
   computed: {
