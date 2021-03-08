@@ -1,5 +1,5 @@
-import { FamabonApi } from "@/api/api.js";
 import store from "@/store/index";
+import axios from "axios";
 import Cookies from "js-cookie";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -17,7 +17,6 @@ import Household from "../views/Household.vue";
 import Login from "../views/Login.vue";
 import Statistics from "../views/Statistics.vue";
 
-const api = new FamabonApi();
 Vue.use(VueRouter);
 
 const routes = [
@@ -123,11 +122,26 @@ const router = new VueRouter({
  */
 router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Cookieが存在しない場合はログイン画面に移動
+    if (!methods.checkCookie()) {
+      Cookies.remove("access");
+      Cookies.remove("refresh");
+      Cookies.remove("account_username");
+      Cookies.remove("account_uuid");
+      next("/login");
+    }
+
+    // JWTが有効か確認する
+    axios.defaults.baseURL = "http://127.0.0.1:8001/api/v1/";
+    if (Cookies.get("access")) {
+      let authorization = "jwt " + Cookies.get("access");
+      axios.defaults.headers.common["Authorization"] = authorization;
+    }
     let body = { token: Cookies.get("access") };
-    api
-      .verifyToken(body)
+    let url = "/account/auth/jwt/verify/";
+    axios
+      .post(url, body)
       .then(response => {
-        console.log(response);
         if (response["status"] == "200") {
           store.dispatch("auth/verifyToken", { is_logged_in: true });
           next();
@@ -148,5 +162,18 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
+
+const methods = {
+  checkCookie() {
+    let is_exist_cookies = true;
+    let cookies_key = ["access", "refresh", "account_username", "account_uuid"];
+    for (let key of cookies_key) {
+      if (typeof Cookies.get(key) === "undefined") {
+        is_exist_cookies = false;
+      }
+    }
+    return is_exist_cookies;
+  }
+};
 
 export default router;

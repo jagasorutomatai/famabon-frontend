@@ -62,8 +62,13 @@ export default {
     }
   }),
   methods: {
-    login() {
-      this.callApiCreateJWT();
+    async login() {
+      await this.callApiCreateJWT();
+      this.setAuthorization();
+      await this.callApiGetAccountDetail();
+      this.$store.dispatch("auth/login");
+      this.is_error = false;
+      this.$router.push({ path: "/" });
     },
     toAccountCreatePage() {
       this.$router.push({ name: "account_create" });
@@ -77,10 +82,6 @@ export default {
           if (response.status == "200") {
             Cookies.set("access", response["data"]["access"]);
             Cookies.set("refresh", response["data"]["refresh"]);
-            this.callApiGetAccountDetail();
-            this.$store.dispatch("auth/login");
-            this.is_error = false;
-            this.$router.push({ path: "/" });
           }
         })
         .catch(error => {

@@ -34,7 +34,8 @@ describe("BookSearch.spec.js", () => {
       });
     },
     defaults: {
-      baseURL: ""
+      baseURL: "",
+      headers: { common: { Authorization: "" } }
     }
   };
 

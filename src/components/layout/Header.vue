@@ -1,6 +1,6 @@
 <template>
   <v-app-bar src="logo.png" app clipped-left dense flat dark>
-    <v-app-bar-nav-icon></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon @click="sendDrawer()"></v-app-bar-nav-icon>
     <v-toolbar-title>
       <v-icon left class="mb-1">
         mdi-book-open-page-variant-outline
@@ -47,6 +47,9 @@ export default {
     toGitHubPage() {
       let url = "https://github.com/jagasorutomatai/famabon-frontend";
       window.open(url, "_blank");
+    },
+    sendDrawer() {
+      this.$emit("sendDrawer", this.child_num);
     }
   },
   watch: {
