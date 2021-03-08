@@ -15,6 +15,7 @@ import Account from "../views/Account.vue";
 import Home from "../views/Home.vue";
 import Household from "../views/Household.vue";
 import Login from "../views/Login.vue";
+import NotFound from "../views/NotFound.vue";
 import Statistics from "../views/Statistics.vue";
 
 Vue.use(VueRouter);
@@ -22,7 +23,7 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     component: Home,
     meta: { requiresAuth: true }
   },
@@ -107,6 +108,11 @@ const routes = [
     path: "/household/statistics",
     name: "statistics",
     component: Statistics,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/*",
+    component: NotFound,
     meta: { requiresAuth: true }
   }
 ];
