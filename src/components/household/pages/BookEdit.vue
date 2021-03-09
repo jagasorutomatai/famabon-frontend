@@ -166,7 +166,7 @@ export default {
     // 帳簿詳細を取得するAPI呼び出し
     callApiGetBookDetail() {
       let uuid = this.$route.params["uuid"];
-      let url = "/household/books/" + uuid + "/";
+      let url = process.env.VUE_APP_API_BOOKS + uuid + "/";
       return this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchBookDetail", {
           book_detail: response["data"]
@@ -176,7 +176,8 @@ export default {
     },
     // タグ全件取得するAPI呼び出し
     callApiGetTagList() {
-      return this.$http.get("/household/tags/").then(response => {
+      let url = process.env.VUE_APP_API_TAGS;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("tag/dispatchTagList", {
           tag_list: response["data"]
         });
@@ -184,7 +185,7 @@ export default {
     },
     // 帳簿を更新するAPI呼び出し
     callApiPutBook() {
-      let url = "/household/books/" + this.form.uuid + "/";
+      let url = process.env.VUE_APP_API_BOOKS + this.form.uuid + "/";
       this.$http
         .put(url, this.form)
         .then(response => {

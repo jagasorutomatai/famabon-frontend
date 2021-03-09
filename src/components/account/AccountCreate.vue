@@ -80,8 +80,9 @@ export default {
   }),
   methods: {
     createAccount() {
+      let url = process.env.VUE_APP_API_USERS;
       return this.$http
-        .post("/account/auth/users/", this.form)
+        .post(url, this.form)
         .then(response => {
           if (response.status == "201") {
             this.$router.push({ name: "login" });

@@ -155,7 +155,8 @@ export default {
     },
     // タグ全件取得するAPI呼び出し
     callApiGetTagList() {
-      return this.$http.get("/household/tags/").then(response => {
+      let url = process.env.VUE_APP_API_TAGS;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("tag/dispatchTagList", {
           tag_list: response["data"]
         });
@@ -163,8 +164,9 @@ export default {
     },
     // 帳簿を作成するAPI呼び出し
     callApiPostBook() {
+      let url = process.env.VUE_APP_API_BOOKS;
       return this.$http
-        .post("/household/books/", this.form)
+        .post(url, this.form)
         .then(response => {
           if (response.status == "201") {
             this.error_messages = {};

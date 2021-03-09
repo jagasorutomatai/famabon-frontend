@@ -138,13 +138,13 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // JWTが有効か確認する
-    axios.defaults.baseURL = "http://127.0.0.1:8001/api/v1/";
+    axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
     if (Cookies.get("access")) {
       let authorization = "jwt " + Cookies.get("access");
       axios.defaults.headers.common["Authorization"] = authorization;
     }
     let body = { token: Cookies.get("access") };
-    let url = "/account/auth/jwt/verify/";
+    let url = process.env.VUE_APP_API_JWT_VERIFY;
     axios
       .post(url, body)
       .then(response => {

@@ -129,7 +129,8 @@ export default {
     },
     // 帳簿の期間を取得するAPI呼び出し
     callApiGetPeriod() {
-      this.$http.get("/household/books/period/").then(response => {
+      let url = process.env.VUE_APP_API_PERIOD;
+      this.$http.get(url).then(response => {
         this.$store.dispatch("statistics/dispatchPeriod", {
           period: response.data
         });

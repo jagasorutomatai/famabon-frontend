@@ -51,7 +51,8 @@ export default {
     },
     // 統計データ(日別の合計)を取得するAPI呼び出し
     callApiGetTotalByDate() {
-      return this.$http.get("/household/books/totalByDate/").then(response => {
+      let url = process.env.VUE_APP_API_BOOKS_TOTALBYDATE;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("statistics/dispatchTotalByDate", {
           total_by_date: response.data
         });
@@ -59,7 +60,7 @@ export default {
     },
     // フィルターした統計データ(日別の合計)を取得するAPI呼び出し
     callApiGetFilterTotalByDate(body) {
-      let url = "/household/books/totalByDate/";
+      let url = process.env.VUE_APP_API_BOOKS_TOTALBYDATE;
       let date_after = "date_after=" + body.date_after;
       let date_before = "date_before=" + body.date_before;
       url = url + "?" + date_after + "&" + date_before;

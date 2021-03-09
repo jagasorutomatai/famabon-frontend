@@ -41,7 +41,8 @@ export default {
     },
     // 統計データ(タグ別の合計)を取得するAPI呼び出し
     callApiGetTotalByTag() {
-      return this.$http.get("/household/books/totalByTag/").then(response => {
+      let url = process.env.VUE_APP_API_BOOKS_TOTALBYTAG;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("statistics/dispatchTotalByTag", {
           total_by_tag: response.data
         });
@@ -49,7 +50,7 @@ export default {
     },
     // フィルターした統計データ(タグ別の合計)を取得するAPI呼び出し
     callApiGetFilterTotalByTag(body) {
-      let url = "/household/books/totalByTag/";
+      let url = process.env.VUE_APP_API_BOOKS_TOTALBYTAG;
       let date_after = "date_after=" + body.date_after;
       let date_before = "date_before=" + body.date_before;
       url = url + "?" + date_after + "&" + date_before;

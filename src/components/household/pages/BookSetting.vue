@@ -202,7 +202,8 @@ export default {
     },
     // タグ全件取得するAPI呼び出し
     callApiGetTagList() {
-      return this.$http.get("/household/tags/").then(response => {
+      let url = process.env.VUE_APP_API_TAGS;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("tag/dispatchTagList", {
           tag_list: response["data"]
         });
@@ -210,8 +211,9 @@ export default {
     },
     // タグ作成するAPI呼び出し
     callApiPostTag() {
+      let url = process.env.VUE_APP_API_TAGS;
       return this.$http
-        .post("/household/tags/", this.form)
+        .post(url, this.form)
         .then(response => {
           if (response.status == "201") {
             this.callApiGetTagList();
@@ -226,7 +228,7 @@ export default {
     },
     // タグを更新するAPI呼び出し
     callApiPutTag() {
-      let url = "/household/tags/" + this.form.uuid + "/";
+      let url = process.env.VUE_APP_API_TAGS + this.form.uuid + "/";
       return this.$http
         .put(url, this.form)
         .then(response => {
@@ -243,7 +245,7 @@ export default {
     },
     // タグを削除するAPI呼び出し
     callApiDeleteTag() {
-      let url = "/household/tags/" + this.form.uuid + "/";
+      let url = process.env.VUE_APP_API_TAGS + this.form.uuid + "/";
       return this.$http.delete(url).then(response => {
         if (response.status == "204") {
           this.callApiGetTagList();
