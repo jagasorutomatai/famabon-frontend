@@ -124,7 +124,8 @@ export default {
     },
     // 帳簿の詳細を取得するAPI呼び出し
     callApiGetBookDetail() {
-      let url = "/household/books/" + this.$route.params["uuid"] + "/";
+      let url =
+        process.env.VUE_APP_API_BOOKS + this.$route.params["uuid"] + "/";
       this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchBookDetail", {
           book_detail: response["data"]
@@ -134,7 +135,8 @@ export default {
     },
     // 帳簿を削除するAPI呼び出し
     callApiDeleteBook() {
-      let url = "/household/books/" + this.$route.params["uuid"] + "/";
+      let url =
+        process.env.VUE_APP_API_BOOKS + this.$route.params["uuid"] + "/";
       this.$http.delete(url).then(response => {
         if (response.status == "204") {
           this.$router.push({ name: "book" });

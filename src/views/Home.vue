@@ -34,7 +34,8 @@ export default {
 
     /* 帳簿全件取得するAPI呼び出し */
     callApiGetBookList() {
-      return this.$http.get("/household/books/").then(response => {
+      let url = process.env.VUE_APP_API_BOOKS;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("book/dispatchBookList", {
           book_list: response["data"]
         });

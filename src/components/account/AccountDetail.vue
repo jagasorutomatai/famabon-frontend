@@ -47,7 +47,8 @@ export default {
   },
   methods: {
     initAccountDetail() {
-      this.$http.get("/account/auth/users/me/").then(response => {
+      let url = process.env.VUE_APP_API_USERS_ME;
+      this.$http.get(url).then(response => {
         this.$store.dispatch("account/dispatchAccount", {
           account: response.data
         });

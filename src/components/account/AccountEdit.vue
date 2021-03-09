@@ -90,8 +90,9 @@ export default {
   }),
   methods: {
     update() {
+      let url = process.env.VUE_APP_API_USERS_SET_PASSWORD;
       this.$http
-        .post("/account/auth/users/set_password/", this.form)
+        .post(url, this.form)
         .then(response => {
           if (response.status == "204") {
             this.error_messages = {};

@@ -76,7 +76,7 @@ export default {
     },
     // JWTを発行するAPI呼び出し
     callApiCreateJWT() {
-      let url = "/account/auth/jwt/create/";
+      let url = process.env.VUE_APP_API_JWT_CREATE;
       return this.$http
         .post(url, this.form)
         .then(response => {
@@ -98,7 +98,8 @@ export default {
     },
     // ログインしているアカウントを取得するAPI呼び出し
     callApiGetAccountDetail() {
-      return this.$http.get("/account/auth/users/me/").then(response => {
+      let url = process.env.VUE_APP_API_USERS_ME;
+      return this.$http.get(url).then(response => {
         Cookies.set("account_username", response["data"]["username"]);
         Cookies.set("account_uuid", response["data"]["uuid"]);
       });

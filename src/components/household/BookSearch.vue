@@ -154,7 +154,8 @@ export default {
     },
     // タグ全件取得するAPI呼び出し
     callApiGetTagList() {
-      return this.$http.get("/household/tags/").then(response => {
+      let url = process.env.VUE_APP_API_TAGS;
+      return this.$http.get(url).then(response => {
         this.$store.dispatch("tag/dispatchTagList", {
           tag_list: response["data"]
         });
@@ -167,7 +168,8 @@ export default {
       let date_before = "date_before=" + this.form.date_before;
       let tag = "tag=" + this.form.tag;
       let url =
-        "/household/books/?" +
+        process.env.VUE_APP_API_BOOKS +
+        "?" +
         title +
         "&" +
         date_after +

@@ -7,7 +7,7 @@ export default {
       this.setAuthorization();
     },
     setBaseUrl() {
-      this.$http.defaults.baseURL = "http://127.0.0.1:8001/api/v1/";
+      this.$http.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
     },
     setAuthorization() {
       if (Cookies.get("access")) {
