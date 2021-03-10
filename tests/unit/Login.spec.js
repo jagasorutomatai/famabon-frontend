@@ -85,7 +85,7 @@ describe("BookSearch.spec.js", () => {
     expect(Cookies.get("refresh")).toBe("refresh token");
     expect(mockRouterPush).toHaveBeenCalled();
     expect(mockRouterPush).toHaveBeenCalledWith({
-      path: "/"
+      name: "home"
     });
   });
   it("アカウント作成ページへ移動する処理の確認", async () => {
